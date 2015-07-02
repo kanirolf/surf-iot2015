@@ -23,6 +23,10 @@
             android:name=".CheckBandOnActivity"
             android:label="@string/title_activity_check_band_on" >
         </activity>
+        <activity
+            android:name=".SensorDataConsole"
+            android:label="@string/title_activity_sensor_data_console" >
+        </activity>
     </application>
 
 </manifest>

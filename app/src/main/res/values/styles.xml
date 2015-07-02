@@ -5,4 +5,8 @@
         <!-- Customize your theme here. -->
     </style>
 
+    <!-- TODO: Decide on a common structure for each sensor data display. -->
+    <style name="SensorDataConsoleElement">
+    </style>
+
 </resources>
