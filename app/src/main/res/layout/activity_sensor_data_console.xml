@@ -1,15 +1,386 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
 
+    android:id="@+id/sensorDataBackground"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+
     android:orientation="vertical"
 
-    tools:context="lab.star.surf_iot2015.SensorDataConsole">
+    android:background="#77df77"
+    tools:context="lab.star.surf_iot2015.SensorDataConsole"
 
-    <LinearLayout></LinearLayout>
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    android:weightSum="48">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:orientation="horizontal"
+
+        android:layout_weight="5"
+
+        android:weightSum="28">
+
+        <Space
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"
+            />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="7"
+
+            android:src="@drawable/armband_vertical"
+            />
+
+        <Space android:id="@+id/bandIsOnSpacer"
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="11"
+            />
+
+        <TextView android:id="@+id/bandIsOnStatic"
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:paddingBottom="10dp"
+            android:gravity="bottom"
+
+            android:layout_weight="5"
+
+            android:text="band is"
+            android:textSize="18dp"
+            android:textColor="#ffffff"
+            />
+
+        <TextView android:id="@+id/bandIsOnStatus"
+
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:paddingBottom="5dp"
+            android:gravity="bottom"
+
+            android:layout_weight="4"
+
+            android:text="ON"
+            android:textSize="35dp"
+            android:textStyle="bold"
+            android:textColor="#ffffff"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout android:id="@+id/heartbeatCard"
+
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:weightSum="28"
+        android:layout_weight="8">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="8"
+
+            android:weightSum="8"
+
+            android:orientation="vertical"
+            android:background="@drawable/heartrate_numerical_bkgd" >
+
+            <Space
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+
+                android:layout_weight="1"
+                />
+            <TextView android:id="@+id/heartRateValue"
+
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+
+                android:layout_weight="4"
+
+                android:text="80"
+                android:fontFamily="sans-serif-light"
+                android:textSize="40dp"
+                android:textColor="#ffffff"
+                android:gravity="center"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+
+                android:layout_weight="1.5"
+
+                android:text="bpm"
+                android:textColor="#ffffff"
+                android:textSize="15dp"
+                android:fontFamily="Roboto"
+                android:textStyle="bold"
+                android:gravity="center"
+                />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="20"
+
+            android:weightSum="20"
+            android:background="@drawable/sensor_label_bkgd">
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="4"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:paddingTop="30dp"
+                android:layout_weight="9"
+
+                android:text="Heartbeat"
+                android:fontFamily="sans-serif-light"
+                android:textSize="25dp"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="1"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="5"
+
+                android:src="@drawable/heartrate"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:layout_weight="2"
+        />
+
+    <LinearLayout android:id="@+id/skintempCard"
+
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:weightSum="28"
+        android:layout_weight="8">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="8"
+
+            android:weightSum="8"
+
+            android:orientation="vertical"
+            android:background="@drawable/skintemp_numerical_bkgd" >
+
+            <Space
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+
+                android:layout_weight="1"
+                />
+            <TextView android:id="@+id/skinTempValue"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+
+                android:layout_weight="4"
+
+                android:text="67"
+                android:fontFamily="sans-serif-light"
+                android:textSize="40dp"
+                android:textColor="#ffffff"
+                android:gravity="center"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+
+                android:layout_weight="1.5"
+
+                android:text="F°"
+                android:textColor="#ffffff"
+                android:textSize="15dp"
+                android:fontFamily="Roboto"
+                android:textStyle="bold"
+                android:gravity="center"
+                />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="20"
+
+            android:weightSum="20"
+            android:background="@drawable/sensor_label_bkgd">
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="1.2"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:paddingTop="15dp"
+                android:layout_weight="11.8"
+
+                android:text="Skin Temperature"
+                android:fontFamily="sans-serif-light"
+                android:textSize="25dp"
+                android:gravity="right"
+                android:lineSpacingMultiplier="0.8"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="2"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="3.5"
+
+                android:src="@drawable/skintemp"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:layout_weight="2"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:weightSum="28"
+        android:layout_weight="8">
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="8"
+
+            android:weightSum="8"
+
+            android:orientation="vertical"
+            android:background="@drawable/stepcount_numerical_bkgd" >
+
+            <Space
+                android:layout_height="0dp"
+                android:layout_width="match_parent"
+
+                android:layout_weight="1.5"
+                />
+            <TextView android:id="@+id/pedometerValue"
+
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+
+                android:layout_weight="3"
+
+                android:text="4096"
+                android:fontFamily="sans-serif-light"
+                android:textSize="30dp"
+                android:textColor="#ffffff"
+                android:gravity="center"
+                />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+
+                android:layout_weight="1.5"
+
+                android:text="steps"
+                android:textColor="#ffffff"
+                android:textSize="15dp"
+                android:fontFamily="Roboto"
+                android:textStyle="bold"
+                android:gravity="center"
+                />
+
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="20"
+
+            android:weightSum="20"
+            android:background="@drawable/sensor_label_bkgd">
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="7.5"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:paddingTop="15dp"
+                android:layout_weight="5.5"
+
+                android:text="Step Count"
+                android:fontFamily="sans-serif-light"
+                android:textSize="25dp"
+                android:gravity="right"
+                android:lineSpacingMultiplier="0.8"/>
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="2"/>
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+
+                android:layout_weight="3.5"
+
+                android:src="@drawable/stepcount"
+                android:scaleType="centerInside"/>
+
+        </LinearLayout>
+
+
+    </LinearLayout>
 
 </LinearLayout>

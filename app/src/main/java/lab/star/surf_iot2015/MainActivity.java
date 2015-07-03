@@ -51,6 +51,7 @@ public class MainActivity extends ActionBarActivity {
         protected Void doInBackground (Void... params){
             try {
                 if (getConnectedBandClient()) {
+                    client.disconnect().await();
                     startActivity(new Intent(MainActivity.this, CheckBandOnActivity.class));
                 }
             } catch(Exception ex){

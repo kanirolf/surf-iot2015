@@ -25,7 +25,8 @@
         </activity>
         <activity
             android:name=".SensorDataConsole"
-            android:label="@string/title_activity_sensor_data_console" >
+            android:label="@string/title_activity_sensor_data_console"
+            android:theme="@style/Theme.AppCompat.NoActionBar">
         </activity>
     </application>
 

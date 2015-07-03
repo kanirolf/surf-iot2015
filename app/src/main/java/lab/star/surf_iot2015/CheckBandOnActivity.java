@@ -3,6 +3,7 @@ package lab.star.surf_iot2015;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -16,32 +17,52 @@ import com.microsoft.band.sensors.BandContactEventListener;
 
 public class CheckBandOnActivity extends ActionBarActivity {
 
+    private BandClient client;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_check_band_on);
 
         BandInfo[] devices = BandClientManager.getInstance().getPairedBands();
-        final BandClient client = BandClientManager.getInstance().create(getBaseContext(), devices[0]);
+        client = BandClientManager.getInstance().create(getBaseContext(), devices[0]);
 
         new Thread(new Runnable() {
             @Override
             public void run() {
-                try {
-                    if (client.connect().await() == ConnectionState.CONNECTED) {
-                        client.getSensorManager().registerContactEventListener(contactListener);
+                if (client.getConnectionState() != ConnectionState.CONNECTED) {
+                    try {
+                            if (client.connect().await() != ConnectionState.CONNECTED) {
+                                return;
+                            }
+                    } catch (Exception ex) {
+                        Log.d("CheckBandOnActivity", "Error:", ex);
+                        return;
                     }
+                }
+                try {
+                    Log.d("CheckBandOnActivity", "Registering listener...");
+                    client.getSensorManager().registerContactEventListener(contactListener);
+                    Log.d("CheckBandOnActivity", "Listener registered...");
                 } catch (Exception ex){
+                    Log.d("CheckBandOnActivity", "Uh, something happened...");
+                    Log.e("CheckBandOnActivity", "Error:", ex);
+                    return;
                 }
             }
-        }).run();
+        }).start();
     }
 
     private BandContactEventListener contactListener = new BandContactEventListener() {
         @Override
-        public void onBandContactChanged(BandContactEvent bandContactEvent) {
+        public void onBandContactChanged(final BandContactEvent bandContactEvent) {
             switch (bandContactEvent.getContactState()){
                 case WORN:
+                    Log.d("CheckBandOnActivity", "The band is on!");
+                    try {
+                        client.disconnect().await();
+                    } catch (Exception ex) {
+                        Log.d("CheckBandOnActivity", "disconnecting from Band", ex);
+                    }
                     startActivity(new Intent(CheckBandOnActivity.this, SensorDataConsole.class));
                     break;
                 case NOT_WORN:

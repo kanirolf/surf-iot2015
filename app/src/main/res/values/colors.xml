@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="affirmative">#77df77</color>
+    <color name="negative">#df7777</color>
+</resources>
