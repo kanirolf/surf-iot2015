@@ -1,12 +1,16 @@
 package lab.star.surf_iot2015;
 
+import android.app.Activity;
 import android.content.res.Resources;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Space;
 import android.widget.TextView;
@@ -26,23 +30,19 @@ import com.microsoft.band.sensors.BandSkinTemperatureEvent;
 import com.microsoft.band.sensors.BandSkinTemperatureEventListener;
 import com.microsoft.band.sensors.HeartRateConsentListener;
 
-
-// TODO: Implement subscriptions to Contact, HeartRate, SkinTemp, UV (do we really need though?) and
-//       pedometer.
-
 // TODO: Grey out HeartRate and SkinTemp when Contact is NOT_WORN (easy, just implement it in the
 //       listener.) Also make background red to indicate the Band is not on.
 
 // TODO: Maybe? move HeartRate and SkinTemp below data which is not dependent on being worn when
 //       NOT_WORN is triggered.
 
-public class SensorDataConsole extends ActionBarActivity {
-
+public class SensorDataConsole extends Activity {
 
     private BandClient client; // for use in heartRateListener
 
     // variables for displaying Band contact
     private LinearLayout bandIsOnMood;
+    private ImageView bandIsOnImage;
     private TextView bandIsOnStatus;
     private Space bandIsOnSpacer;
 
@@ -60,6 +60,7 @@ public class SensorDataConsole extends ActionBarActivity {
         // get Views after setContentView
         // get views for band contact
         bandIsOnMood = (LinearLayout) findViewById(R.id.sensorDataBackground);
+        bandIsOnImage = (ImageView) findViewById(R.id.bandIsOnImage);
         bandIsOnStatus = (TextView) findViewById(R.id.bandIsOnStatus);
         bandIsOnSpacer = (Space) findViewById(R.id.bandIsOnSpacer);
 
@@ -74,9 +75,10 @@ public class SensorDataConsole extends ActionBarActivity {
 
         // get Microsoft BandClient instance
         BandInfo[] pairedBands = BandClientManager.getInstance().getPairedBands();
-        client = BandClientManager.getInstance().create(this, pairedBands[1]);
+        client = BandClientManager.getInstance().create(this, pairedBands[0]);
 
         // create a Thread to handle connecting to the Band and registering the sensor listeners
+        // TODO: probably make this into an AsyncTask and put it in another .class/.java somewhere
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -88,7 +90,7 @@ public class SensorDataConsole extends ActionBarActivity {
                         return;
                     }
                 } catch (Exception ex){
-                    L.d("SensorDataConsole", "Error occurred while connecting to watch:", ex);
+                    Log.d("SensorDataConsole", "Error occurred while connecting to watch:", ex);
                 }
 
                 try {
@@ -105,22 +107,24 @@ public class SensorDataConsole extends ActionBarActivity {
                         client.getSensorManager().registerHeartRateEventListener(heartRateListener);
                     }
                 } catch (Exception ex) {
-                    L.d("SensorDataConsole", "Error occured while registering sensor event " +
+                    Log.d("SensorDataConsole", "Error occurred while registering sensor event " +
                             "listeners:", ex);
                 }
             }
-        });
+        }).start();
 
     }
 
+    // instantiate a HeartRateListener instance to pass to the requestHeartRateConsent method
+    // this will register the heart rate listener when the user agrees.
     private HeartRateConsentListener consentListener = new HeartRateConsentListener() {
         @Override
         public void userAccepted(boolean b) {
             try {
                 client.getSensorManager().registerHeartRateEventListener(heartRateListener);
             } catch (Exception ex){
-                L.d("SensorDataConsole", "Error occured while registering heart sensor event " +
-                        "listener after user consent");
+                Log.d("SensorDataConsole", "Error occured while registering heart sensor event " +
+                        "listener after user consent", ex);
             }
         }
     };
@@ -130,20 +134,49 @@ public class SensorDataConsole extends ActionBarActivity {
         public void onBandContactChanged(BandContactEvent bandContactEvent) {
             switch (bandContactEvent.getContactState()){
                 case WORN:
-                    bandIsOnMood.setBackground(new ColorDrawable(R.color.affirmative));
-                    bandIsOnStatus.setLayoutParams(new LinearLayout.LayoutParams(0,
-                            ViewGroup.LayoutParams.MATCH_PARENT, 5.5f));
-                    bandIsOnSpacer.setLayoutParams(new LinearLayout.LayoutParams(0,
-                            ViewGroup.LayoutParams.MATCH_PARENT, 9.5f));
-                    bandIsOnStatus.setText("ON");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // set color to green to show band on
+                            bandIsOnMood.setBackground(new ColorDrawable(
+                                    getResources().getColor(R.color.affirmative)));
+
+                            // resize elements to fit "ON"
+                            bandIsOnStatus.setLayoutParams(new LinearLayout.LayoutParams(0,
+                                    ViewGroup.LayoutParams.MATCH_PARENT, 4.5f));
+                            bandIsOnSpacer.setLayoutParams(new LinearLayout.LayoutParams(0,
+                                    ViewGroup.LayoutParams.MATCH_PARENT, 10.5f));
+
+                            // image of band should be visible when band is on
+                            bandIsOnImage.setVisibility(View.VISIBLE);
+
+                            // set status to ON :D
+                            bandIsOnStatus.setText("ON");
+
+                        }
+                    });
                     break;
                 case NOT_WORN:
-                    bandIsOnMood.setBackground(new ColorDrawable(R.color.negative));
-                    bandIsOnStatus.setLayoutParams(new LinearLayout.LayoutParams(0,
-                            ViewGroup.LayoutParams.MATCH_PARENT, 4f));
-                    bandIsOnSpacer.setLayoutParams(new LinearLayout.LayoutParams(0,
-                            ViewGroup.LayoutParams.MATCH_PARENT, 11f));
-                    bandIsOnStatus.setText("OFF");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // set color to red to show band off
+                            bandIsOnMood.setBackground(new ColorDrawable(
+                                    getResources().getColor(R.color.negative)));
+
+                            // resize elements to fit "OFF"
+                            bandIsOnStatus.setLayoutParams(new LinearLayout.LayoutParams(0,
+                                    ViewGroup.LayoutParams.MATCH_PARENT, 5.5f));
+                            bandIsOnSpacer.setLayoutParams(new LinearLayout.LayoutParams(0,
+                                    ViewGroup.LayoutParams.MATCH_PARENT, 9.5f));
+
+                            // image of band should not be visible when band is off
+                            bandIsOnImage.setVisibility(View.INVISIBLE);
+
+                            // set status to OFF :(
+                            bandIsOnStatus.setText("OFF");
+                        }
+                    });
                     break;
             }
         }
@@ -156,7 +189,11 @@ public class SensorDataConsole extends ActionBarActivity {
             skinTempValue.post(new Runnable() {
                 @Override
                 public void run() {
-                    skinTempValue.setText(String.format("%.2d",.bandSkinTemperatureEvent.getTemperature());
+                    // convert temperature to Fahrenheit (mostly because this'll be used here first)
+                    // TODO: have user choose between Fahrenheit and Celsius display
+                    skinTempValue.setText(String.format("%.2f",
+                            (bandSkinTemperatureEvent.getTemperature() * 9/5) + 32
+                    ));
                 }
             });
         }
@@ -180,7 +217,7 @@ public class SensorDataConsole extends ActionBarActivity {
             heartRateValue.post(new Runnable() {
                 @Override
                 public void run() {
-                    heartRateValue.setText(bandHeartRateEvent.getHeartRate());
+                    heartRateValue.setText(Integer.toString(bandHeartRateEvent.getHeartRate()));
                 }
             });
         }

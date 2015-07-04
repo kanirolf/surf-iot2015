@@ -5,381 +5,274 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp"
-
+    android:background="#77df77"
     android:orientation="vertical"
 
-    android:background="#77df77"
-    tools:context="lab.star.surf_iot2015.SensorDataConsole"
+    android:paddingLeft="20dp"
 
-    android:weightSum="48">
+    android:paddingRight="20dp"
+    android:theme="@style/LinearLayoutVerticalWeighted"
+
+    android:weightSum="48"
+
+    tools:context="lab.star.surf_iot2015.SensorDataConsole">
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_weight="5"
 
         android:orientation="horizontal"
 
-        android:layout_weight="5"
+        android:theme="@style/LinearLayoutHorizontalWeighted"
 
         android:weightSum="28">
 
-        <Space
-
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:layout_weight="1"
-            />
+        <Space android:layout_weight="1" />
 
         <ImageView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:id="@+id/bandIsOnImage"
 
             android:layout_weight="7"
 
-            android:src="@drawable/armband_vertical"
-            />
+            android:src="@drawable/armband_vertical" />
 
-        <Space android:id="@+id/bandIsOnSpacer"
+        <Space
+            android:id="@+id/bandIsOnSpacer"
 
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_weight="11" />
 
-            android:layout_weight="11"
-            />
-
-        <TextView android:id="@+id/bandIsOnStatic"
-
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:paddingBottom="10dp"
-            android:gravity="bottom"
+        <TextView
+            android:id="@+id/bandIsOnStatic"
 
             android:layout_weight="5"
 
-            android:text="band is"
-            android:textSize="18dp"
-            android:textColor="#ffffff"
-            />
-
-        <TextView android:id="@+id/bandIsOnStatus"
-
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:paddingBottom="5dp"
             android:gravity="bottom"
+
+            android:paddingBottom="10dp"
+            android:text="band is"
+            android:textColor="#ffffff"
+
+            android:textSize="18dp" />
+
+        <TextView
+            android:id="@+id/bandIsOnStatus"
 
             android:layout_weight="4"
 
+            android:gravity="bottom"
+
+            android:paddingBottom="5dp"
             android:text="ON"
-            android:textSize="35dp"
-            android:textStyle="bold"
             android:textColor="#ffffff"
-            />
+            android:textSize="35dp"
+
+            android:textStyle="bold" />
 
     </LinearLayout>
-
-    <LinearLayout android:id="@+id/heartbeatCard"
-
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-
-        android:weightSum="28"
-        android:layout_weight="8">
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:layout_weight="8"
-
-            android:weightSum="8"
-
-            android:orientation="vertical"
-            android:background="@drawable/heartrate_numerical_bkgd" >
-
-            <Space
-                android:layout_height="0dp"
-                android:layout_width="match_parent"
-
-                android:layout_weight="1"
-                />
-            <TextView android:id="@+id/heartRateValue"
-
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-
-                android:layout_weight="4"
-
-                android:text="80"
-                android:fontFamily="sans-serif-light"
-                android:textSize="40dp"
-                android:textColor="#ffffff"
-                android:gravity="center"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-
-                android:layout_weight="1.5"
-
-                android:text="bpm"
-                android:textColor="#ffffff"
-                android:textSize="15dp"
-                android:fontFamily="Roboto"
-                android:textStyle="bold"
-                android:gravity="center"
-                />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:layout_weight="20"
-
-            android:weightSum="20"
-            android:background="@drawable/sensor_label_bkgd">
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-
-                android:layout_weight="4"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-
-                android:paddingTop="30dp"
-                android:layout_weight="9"
-
-                android:text="Heartbeat"
-                android:fontFamily="sans-serif-light"
-                android:textSize="25dp"/>
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-
-                android:layout_weight="1"/>
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-
-                android:layout_weight="5"
-
-                android:src="@drawable/heartrate"/>
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-
-        android:layout_weight="2"
-        />
-
-    <LinearLayout android:id="@+id/skintempCard"
-
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-
-        android:weightSum="28"
-        android:layout_weight="8">
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:layout_weight="8"
-
-            android:weightSum="8"
-
-            android:orientation="vertical"
-            android:background="@drawable/skintemp_numerical_bkgd" >
-
-            <Space
-                android:layout_height="0dp"
-                android:layout_width="match_parent"
-
-                android:layout_weight="1"
-                />
-            <TextView android:id="@+id/skinTempValue"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-
-                android:layout_weight="4"
-
-                android:text="67"
-                android:fontFamily="sans-serif-light"
-                android:textSize="40dp"
-                android:textColor="#ffffff"
-                android:gravity="center"
-                />
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-
-                android:layout_weight="1.5"
-
-                android:text="F°"
-                android:textColor="#ffffff"
-                android:textSize="15dp"
-                android:fontFamily="Roboto"
-                android:textStyle="bold"
-                android:gravity="center"
-                />
-
-        </LinearLayout>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:layout_weight="20"
-
-            android:weightSum="20"
-            android:background="@drawable/sensor_label_bkgd">
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-
-                android:layout_weight="1.2"/>
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-
-                android:paddingTop="15dp"
-                android:layout_weight="11.8"
-
-                android:text="Skin Temperature"
-                android:fontFamily="sans-serif-light"
-                android:textSize="25dp"
-                android:gravity="right"
-                android:lineSpacingMultiplier="0.8"/>
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-
-                android:layout_weight="2"/>
-            <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-
-                android:layout_weight="3.5"
-
-                android:src="@drawable/skintemp"/>
-
-        </LinearLayout>
-
-
-    </LinearLayout>
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-
-        android:layout_weight="2"
-        />
 
     <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:id="@+id/heartbeatCard"
 
-        android:weightSum="28"
-        android:layout_weight="8">
+        android:layout_weight="8"
+        android:theme="@style/LinearLayoutHorizontalWeighted"
+
+        android:weightSum="28">
+
+        <LinearLayout
+            android:layout_weight="8"
+
+            android:background="@drawable/heartrate_numerical_bkgd"
+
+            android:orientation="vertical"
+            android:theme="@style/LinearLayoutVerticalWeighted"
+
+            android:weightSum="8">
+
+            <Space android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/heartRateValue"
+
+                style="@style/SensorDataConsole.Data"
+
+                android:layout_weight="4"
+
+                android:text="80" />
+
+            <TextView
+                style="@style/SensorDataConsole.DataUnits"
+
+                android:layout_weight="1.5"
+
+                android:text="bpm" />
+
+        </LinearLayout>
+
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
 
+            android:layout_weight="20"
+
+            android:background="@drawable/sensor_label_bkgd"
+            android:theme="@style/LinearLayoutHorizontalWeighted"
+
+            android:weightSum="20">
+
+            <Space android:layout_weight="3" />
+
+            <TextView
+                style="@style/SensorDataConsole.DataIdentifier"
+
+                android:layout_weight="10"
+
+                android:text="Heartbeat" />
+
+            <Space android:layout_weight="1" />
+
+            <ImageView
+                android:layout_weight="5"
+
+                android:src="@drawable/heartrate" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <Space android:layout_weight="2" />
+
+    <LinearLayout
+        android:id="@+id/skintempCard"
+
+        android:layout_weight="8"
+        android:theme="@style/LinearLayoutHorizontalWeighted"
+
+        android:weightSum="28">
+
+        <LinearLayout
             android:layout_weight="8"
 
-            android:weightSum="8"
+            android:background="@drawable/skintemp_numerical_bkgd"
 
             android:orientation="vertical"
-            android:background="@drawable/stepcount_numerical_bkgd" >
+            android:theme="@style/LinearLayoutVerticalWeighted"
 
-            <Space
-                android:layout_height="0dp"
-                android:layout_width="match_parent"
+            android:weightSum="8">
+
+            <Space android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/skinTempValue"
+
+                style="@style/SensorDataConsole.Data"
+
+                android:layout_weight="4"
+
+                android:text="67" />
+
+            <TextView
+                style="@style/SensorDataConsole.DataUnits"
 
                 android:layout_weight="1.5"
-                />
-            <TextView android:id="@+id/pedometerValue"
 
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                android:text="F°" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_weight="20"
+
+            android:background="@drawable/sensor_label_bkgd"
+            android:theme="@style/LinearLayoutHorizontalWeighted"
+
+            android:weightSum="20">
+
+            <Space android:layout_weight="0" />
+
+            <TextView
+                style="@style/SensorDataConsole.DataIdentifier"
+
+                android:layout_weight="14"
+
+                android:text="Skin Temperature" />
+
+            <Space android:layout_weight="1" />
+
+            <ImageView
+                android:layout_weight="3.5"
+
+                android:src="@drawable/skintemp" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+    <Space android:layout_weight="2" />
+
+    <LinearLayout
+
+        android:layout_weight="8"
+        android:theme="@style/LinearLayoutHorizontalWeighted"
+
+        android:weightSum="28">
+
+        <LinearLayout
+            android:layout_weight="8"
+
+            android:background="@drawable/stepcount_numerical_bkgd"
+
+            android:orientation="vertical"
+            android:theme="@style/LinearLayoutVerticalWeighted"
+
+            android:weightSum="8">
+
+            <Space android:layout_weight="1.5" />
+
+            <TextView
+                android:id="@+id/pedometerValue"
+
+                style="@style/SensorDataConsole.Data"
 
                 android:layout_weight="3"
 
                 android:text="4096"
-                android:fontFamily="sans-serif-light"
-                android:textSize="30dp"
-                android:textColor="#ffffff"
-                android:gravity="center"
-                />
+                android:textSize="30dp" />
+
             <TextView
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
+                style="@style/SensorDataConsole.DataUnits"
 
                 android:layout_weight="1.5"
 
-                android:text="steps"
-                android:textColor="#ffffff"
-                android:textSize="15dp"
-                android:fontFamily="Roboto"
-                android:textStyle="bold"
-                android:gravity="center"
-                />
+                android:text="steps" />
 
         </LinearLayout>
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
 
+        <LinearLayout
             android:layout_weight="20"
 
-            android:weightSum="20"
-            android:background="@drawable/sensor_label_bkgd">
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+            android:background="@drawable/sensor_label_bkgd"
+            android:theme="@style/LinearLayoutHorizontalWeighted"
 
-                android:layout_weight="7.5"/>
+            android:weightSum="20">
+
+            <Space android:layout_weight="6" />
 
             <TextView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                style="@style/SensorDataConsole.DataIdentifier"
 
-                android:paddingTop="15dp"
-                android:layout_weight="5.5"
+                android:layout_weight="8"
 
-                android:text="Step Count"
-                android:fontFamily="sans-serif-light"
-                android:textSize="25dp"
-                android:gravity="right"
-                android:lineSpacingMultiplier="0.8"/>
-            <Space
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
+                android:text="Step Count" />
 
-                android:layout_weight="2"/>
+            <Space android:layout_weight="1" />
+
             <ImageView
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-
                 android:layout_weight="3.5"
 
-                android:src="@drawable/stepcount"
-                android:scaleType="centerInside"/>
+                android:scaleType="centerInside"
+                android:src="@drawable/stepcount" />
 
         </LinearLayout>
-
 
     </LinearLayout>
 

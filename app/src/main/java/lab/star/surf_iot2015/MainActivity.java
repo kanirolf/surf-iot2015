@@ -1,5 +1,6 @@
 package lab.star.surf_iot2015;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
@@ -24,7 +25,7 @@ import com.microsoft.band.sensors.BandContactEventListener;
 import com.microsoft.band.sensors.BandContactState;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends Activity {
 
     private ImageButton startButton;
     private BandClient client;

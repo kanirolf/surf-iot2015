@@ -1,5 +1,6 @@
 package lab.star.surf_iot2015;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -15,7 +16,7 @@ import com.microsoft.band.sensors.BandContactEvent;
 import com.microsoft.band.sensors.BandContactEventListener;
 
 
-public class CheckBandOnActivity extends ActionBarActivity {
+public class CheckBandOnActivity extends Activity {
 
     private BandClient client;
     @Override
@@ -58,11 +59,11 @@ public class CheckBandOnActivity extends ActionBarActivity {
             switch (bandContactEvent.getContactState()){
                 case WORN:
                     Log.d("CheckBandOnActivity", "The band is on!");
-                    try {
+                    /*try {
                         client.disconnect().await();
                     } catch (Exception ex) {
                         Log.d("CheckBandOnActivity", "disconnecting from Band", ex);
-                    }
+                    }*/
                     startActivity(new Intent(CheckBandOnActivity.this, SensorDataConsole.class));
                     break;
                 case NOT_WORN:
