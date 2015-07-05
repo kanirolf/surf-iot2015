@@ -15,7 +15,7 @@
 
     android:weightSum="48"
 
-    tools:context="lab.star.surf_iot2015.SensorDataConsole">
+    tools:context=".SensorDataConsole">
 
     <LinearLayout
         android:layout_weight="5"
@@ -92,14 +92,14 @@
             <TextView
                 android:id="@+id/heartRateValue"
 
-                style="@style/SensorDataConsole.Data"
+                style="@style/SensorDataConsole_Data"
 
                 android:layout_weight="4"
 
                 android:text="80" />
 
             <TextView
-                style="@style/SensorDataConsole.DataUnits"
+                style="@style/SensorDataConsole_DataUnits"
 
                 android:layout_weight="1.5"
 
@@ -121,7 +121,7 @@
             <Space android:layout_weight="3" />
 
             <TextView
-                style="@style/SensorDataConsole.DataIdentifier"
+                style="@style/SensorDataConsole_DataIdentifier"
 
                 android:layout_weight="10"
 
@@ -163,14 +163,14 @@
             <TextView
                 android:id="@+id/skinTempValue"
 
-                style="@style/SensorDataConsole.Data"
+                style="@style/SensorDataConsole_Data"
 
                 android:layout_weight="4"
 
                 android:text="67" />
 
             <TextView
-                style="@style/SensorDataConsole.DataUnits"
+                style="@style/SensorDataConsole_DataUnits"
 
                 android:layout_weight="1.5"
 
@@ -189,7 +189,7 @@
             <Space android:layout_weight="0" />
 
             <TextView
-                style="@style/SensorDataConsole.DataIdentifier"
+                style="@style/SensorDataConsole_DataIdentifier"
 
                 android:layout_weight="14"
 
@@ -231,7 +231,7 @@
             <TextView
                 android:id="@+id/pedometerValue"
 
-                style="@style/SensorDataConsole.Data"
+                style="@style/SensorDataConsole_Data"
 
                 android:layout_weight="3"
 
@@ -239,7 +239,7 @@
                 android:textSize="30dp" />
 
             <TextView
-                style="@style/SensorDataConsole.DataUnits"
+                style="@style/SensorDataConsole_DataUnits"
 
                 android:layout_weight="1.5"
 
@@ -258,7 +258,7 @@
             <Space android:layout_weight="6" />
 
             <TextView
-                style="@style/SensorDataConsole.DataIdentifier"
+                style="@style/SensorDataConsole_DataIdentifier"
 
                 android:layout_weight="8"
 

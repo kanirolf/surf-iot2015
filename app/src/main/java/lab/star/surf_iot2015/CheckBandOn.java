@@ -16,7 +16,7 @@ import com.microsoft.band.sensors.BandContactEvent;
 import com.microsoft.band.sensors.BandContactEventListener;
 
 
-public class CheckBandOnActivity extends Activity {
+public class CheckBandOn extends Activity {
 
     private BandClient client;
     @Override
@@ -64,7 +64,7 @@ public class CheckBandOnActivity extends Activity {
                     } catch (Exception ex) {
                         Log.d("CheckBandOnActivity", "disconnecting from Band", ex);
                     }*/
-                    startActivity(new Intent(CheckBandOnActivity.this, SensorDataConsole.class));
+                    startActivity(new Intent(CheckBandOn.this, SensorDataConsole.class));
                     break;
                 case NOT_WORN:
                     break;
