@@ -15,7 +15,7 @@
 
     android:weightSum="48"
 
-    tools:context=".SensorDataConsole">
+    tools:context=".MainDataConsole">
 
     <LinearLayout
         android:layout_weight="5"
