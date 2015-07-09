@@ -2,4 +2,10 @@
 <resources>
     <color name="affirmative">#77df77</color>
     <color name="negative">#df7777</color>
+
+    <!-- DataCard colors -->
+    <color name="dataCardSkinTemp">#e0ae49</color>
+    <color name="dataCardHeartRate">#e04949</color>
+    <color name="dataCardStepCount">#497fe0</color>
+
 </resources>

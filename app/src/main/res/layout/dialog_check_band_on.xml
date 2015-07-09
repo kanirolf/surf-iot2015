@@ -21,6 +21,8 @@
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
             android:src="@drawable/band_not_paired"
+
+            android:contentDescription="Icon"
             />
 
         <Space
@@ -34,7 +36,7 @@
             android:textSize="20dp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
-            android:text="@string/dialog_check_band_paired_warning"
+            android:text="@string/dialog_check_band_on_warning"
 
             />
 
@@ -55,7 +57,7 @@
 
             android:textSize="20dp"
             android:textColor="#555555"
-            android:text="@string/dialog_check_band_paired_detail"
+            android:text="@string/dialog_check_band_on_detail"
             />
 
         <Space
@@ -69,7 +71,7 @@
 
             android:textSize="20dp"
             android:textColor="#555555"
-            android:text="@string/dialog_check_band_paired_request"
+            android:text="@string/dialog_check_band_on_request"
             />
 
     </LinearLayout>

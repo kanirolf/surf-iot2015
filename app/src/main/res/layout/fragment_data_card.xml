@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+
+    android:weightSum="28">
+
+    <LinearLayout android:id="@+id/dataDisplayContainer"
+
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+
+        android:layout_weight="8"
+
+        android:background="@drawable/round15dpwhite_left_bkgd"
+
+        android:orientation="vertical"
+
+        android:weightSum="8">
+
+        <Space
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+
+            android:layout_weight="1" />
+
+        <TextView android:id="@+id/dataValue"
+
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+
+            style="@style/SensorDataConsole_Data"
+
+            android:layout_weight="4"
+
+            android:text="0" />
+
+        <TextView android:id="@+id/dataUnits"
+
+            android:layout_height="0dp"
+            android:layout_width="match_parent"
+
+            style="@style/SensorDataConsole_DataUnits"
+
+            android:layout_weight="1.5"
+
+            android:text="" />
+
+    </LinearLayout>
+
+    <LinearLayout
+
+        android:layout_height="match_parent"
+        android:layout_width="0dp"
+
+        android:layout_weight="20"
+
+        android:background="@drawable/round15dpwhite_right_bkgd"
+
+        android:weightSum="20">
+
+        <Space
+
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+
+            android:layout_weight="0" />
+
+        <TextView android:id="@+id/dataIdentifier"
+
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+
+            style="@style/SensorDataConsole_DataIdentifier"
+
+            android:layout_weight="14"
+
+            android:text="" />
+
+        <Space
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+
+            android:layout_weight="1" />
+
+        <ImageView android:id="@+id/dataIcon"
+
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+
+            android:layout_weight="3.5"
+
+            android:src="@android:color/white" />
+
+    </LinearLayout>
+
+</LinearLayout>
