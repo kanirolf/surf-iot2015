@@ -33,7 +33,7 @@ public class HeartRateCardFragment extends DataCardFragment {
                 R.string.data_card_heart_rate_data_units,
                 R.string.data_card_heart_rate_data_identifier,
                 R.drawable.heartrate,
-                R.color.dataCardHeartRate
+                R.color.data_card_heart_rate
         );
 
     }

@@ -4,8 +4,14 @@
     <color name="negative">#df7777</color>
 
     <!-- DataCard colors -->
-    <color name="dataCardSkinTemp">#e0ae49</color>
-    <color name="dataCardHeartRate">#e04949</color>
-    <color name="dataCardStepCount">#497fe0</color>
+    <color name="data_card_skin_temp">#e0ae49</color>
+    <color name="data_card_heart_rate">#e04949</color>
+    <color name="data_card_step_count">#497fe0</color>
+
+    <!-- DataDetail colors -->
+    <color name="data_detail_high_value_bg">#ff5555</color>
+    <color name="data_detail_avg_value_bg">#5ee14b</color>
+    <color name="data_detail_low_value_bg">#5588ff</color>
+    <color name="data_details_warn_exceed_level_bg">#ececec</color>
 
 </resources>

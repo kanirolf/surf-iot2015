@@ -5,13 +5,10 @@ import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebSettings;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.microsoft.band.BandClient;
-import com.microsoft.band.sensors.BandHeartRateEvent;
-import com.microsoft.band.sensors.BandHeartRateEventListener;
 import com.microsoft.band.sensors.BandPedometerEvent;
 import com.microsoft.band.sensors.BandPedometerEventListener;
 
@@ -40,7 +37,7 @@ public class StepCountCardFragment extends DataCardFragment {
                 R.string.data_card_step_count_data_units,
                 R.string.data_card_step_count_data_identifier,
                 R.drawable.stepcount,
-                R.color.dataCardStepCount);
+                R.color.data_card_step_count);
 
         view.findViewById(R.id.dataIdentifier).setLayoutParams(new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.MATCH_PARENT, 3.5f));

@@ -34,7 +34,7 @@ public class TemperatureCardFragment extends DataCardFragment {
                 R.string.data_card_skin_temp_data_units,
                 R.string.data_card_skin_temp_data_identifier,
                 R.drawable.skintemp,
-                R.color.dataCardSkinTemp);
+                R.color.data_card_skin_temp);
     }
 
 }
