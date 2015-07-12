@@ -1,8 +1,44 @@
 <resources>
     <string name="app_name">SURF-IoT 2015</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
-    <string name="title_activity_check_band_on">CheckBandOnActivity</string>
-    <string name="title_activity_sensor_data_console">SensorDataConsole</string>
+
+    <string name="title_activity_main_sensor_console">MainSensorConsole</string>
+
+    <!-- strings for CheckBandPaired -->
+    <string name="dialog_check_band_paired_warning">
+        You are currently not paired with a Microsoft Band.
+    </string>
+    <string name="dialog_check_band_paired_detail">
+        Please ask a parent or guardian to help you pair your Microsoft Band to the device.
+    </string>
+    <string name="dialog_check_band_paired_request">
+        Press OK when the Band is paired.
+    </string>
+
+    <!-- strings for CheckBandOn -->
+    <string name="dialog_check_band_on_warning">
+        The Microsoft Band is currently not being worn.
+    </string>
+    <string name="dialog_check_band_on_detail">
+        Please ask a parent or guardian to assist you in putting on your Microsoft Band.
+    </string>
+    <string name="dialog_check_band_on_request">
+        The app will continue when the Band is put on.
+    </string>
+
+    <!-- Strings for various DataCards -->
+
+        <!-- Strings for Skin Temperature -->
+        <string name="data_card_skin_temp_data_units">F°</string>
+        <string name="data_card_skin_temp_data_identifier">Skin Temperature</string>
+
+        <!-- Strings for Heart Rate -->
+        <string name="data_card_heart_rate_data_units">bpm</string>
+        <string name="data_card_heart_rate_data_identifier">Heartbeat</string>
+
+        <!-- Strings for Step Count -->
+        <string name="data_card_step_count_data_units">steps</string>
+        <string name="data_card_step_count_data_identifier">Step Count</string>
+
 </resources>
