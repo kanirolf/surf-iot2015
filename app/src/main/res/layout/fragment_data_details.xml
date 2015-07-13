@@ -32,7 +32,8 @@
 
             android:textSize="13dp"
             android:fontFamily="sans-serif-light"
-            android:text="@string/data_details_enable_label"/>
+            android:text="@string/data_details_enable_label"
+            android:textColor="@color/data_static_minor_text_color" />
 
         <Space
             android:layout_width="180dp"
@@ -73,7 +74,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
 
-        android:layout_weight="17"/>
+        android:layout_weight="17"
+        android:id="@+id/graphView" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -89,8 +91,51 @@
 
             android:background="@color/data_detail_high_value_bg"
 
-            android:layout_weight="10.66">
+            android:layout_weight="10.66"
+            android:weightSum="10.66">
 
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight=".6" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/imageView2"
+                android:src="@drawable/arrow_up"
+                android:scaleType="fitCenter"
+                android:layout_weight="0.9" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="high"
+                android:id="@+id/textView"
+                android:layout_weight="2.5"
+                android:fontFamily="sans-serif-light"
+                android:gravity="center_vertical|start"
+                android:textColor="@android:color/white" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="--"
+                android:id="@+id/dataDetailsHigh"
+                android:layout_weight="4.16"
+                android:gravity="center_vertical|start"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
         </LinearLayout>
 
 
@@ -100,7 +145,38 @@
 
             android:background="@color/data_detail_avg_value_bg"
 
-            android:layout_weight="10.66">
+            android:layout_weight="10.66"
+            android:weightSum="10.66">
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="2.36" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="avg"
+                android:id="@+id/textView3"
+                android:layout_weight="2.5"
+                android:gravity="center_vertical|start"
+                android:fontFamily="sans-serif-light"
+                android:textColor="@android:color/white" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.5" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="--"
+                android:id="@+id/dataDetailsAvg"
+                android:textColor="@android:color/white"
+                android:textStyle="bold"
+                android:gravity="center_vertical|start"
+                android:layout_weight="4.33" />
         </LinearLayout>
 
         <LinearLayout
@@ -109,8 +185,50 @@
 
             android:background="@color/data_detail_low_value_bg"
 
-            android:layout_weight="10.66">
+            android:layout_weight="10.66"
+            android:weightSum="10.66">
 
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight=".66" />
+
+            <ImageView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:id="@+id/imageView3"
+                android:layout_weight=".75"
+                android:src="@drawable/arrow_down"
+                android:scaleType="fitCenter" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight=".9" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="low"
+                android:id="@+id/textView5"
+                android:layout_weight="2.5"
+                android:gravity="center_vertical|start"
+                android:textColor="@android:color/white" />
+
+            <Space
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1.6" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:text="--"
+                android:id="@+id/dataDetailsLow"
+                android:layout_weight="4"
+                android:gravity="center_vertical|start"
+                android:textColor="@android:color/white"
+                android:textStyle="bold" />
         </LinearLayout>
 
     </LinearLayout>
@@ -156,7 +274,8 @@
             android:textSize="13dp"
             android:fontFamily="sans-serif-light"
             android:text="@string/data_details_warn_exceed_label"
-            android:gravity="center|start"/>
+            android:gravity="center|start"
+            android:textColor="@color/data_static_minor_text_color" />
 
         <Space
             android:layout_width="0dp"
@@ -192,7 +311,8 @@
             android:textSize="13dp"
             android:fontFamily="sans-serif-light"
             android:gravity="center_vertical|start"
-            android:text="@string/data_card_heart_rate_data_units"/>
+            android:text="@string/data_card_heart_rate_data_units"
+            android:textColor="@color/data_static_minor_text_color" />
 
         <CheckBox
             android:layout_width="0dp"

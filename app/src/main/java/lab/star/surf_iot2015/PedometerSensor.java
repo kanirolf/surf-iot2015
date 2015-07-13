@@ -15,12 +15,30 @@ public class PedometerSensor extends Sensor {
 
     private static final String SENSOR_NAME = "Pedometer";
 
+    private BandPedometerEventListener eventListener;
+
     PedometerSensor (BandClient client, Context context){
         super(SENSOR_NAME, client, context);
     }
 
     @Override
     protected void enableResolution(){
+
+        eventListener = new BandPedometerEventListener() {
+            @Override
+            public void onBandPedometerChanged(BandPedometerEvent bandPedometerEvent) {
+
+                String valAsString = Long.toString(bandPedometerEvent.getTotalSteps());
+                data.addEntry(currentTimeMillis(),valAsString);
+
+                for (SensorServiceCallback callback : callbacks){
+                    try {
+                        callback.valueChanged(valAsString);
+                    } catch (RemoteException remoteEx){
+                    }
+                }
+            }
+        };
 
         try {
             client.getSensorManager().registerPedometerEventListener(eventListener);
@@ -37,21 +55,5 @@ public class PedometerSensor extends Sensor {
         }
 
     }
-
-    private BandPedometerEventListener eventListener = new BandPedometerEventListener() {
-        @Override
-        public void onBandPedometerChanged(BandPedometerEvent bandPedometerEvent) {
-
-            String valAsString = Long.toString(bandPedometerEvent.getTotalSteps());
-            data.addEntry(currentTimeMillis(),valAsString);
-
-            for (SensorServiceCallback callback : callbacks){
-                try {
-                    callback.valueChanged(valAsString);
-                } catch (RemoteException remoteEx){
-                }
-            }
-        }
-    };
 
 }

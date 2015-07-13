@@ -5,6 +5,6 @@ package lab.star.surf_iot2015;
 
 interface SensorDataReader {
 
-    Map findEntriesUpTo (long timestamp);
+    Map findEntriesUpTo (String sensor, long timestamp);
 
 }

@@ -18,9 +18,6 @@
         android:background="@color/affirmative"
         android:orientation="vertical"
 
-        android:paddingLeft="20dp"
-
-        android:paddingRight="20dp"
         android:theme="@style/LinearLayoutVerticalWeighted"
 
         android:weightSum="48"
@@ -30,6 +27,9 @@
             android:layout_weight="5"
 
             android:orientation="horizontal"
+
+            android:paddingLeft="20dp"
+            android:paddingRight="20dp"
 
             android:theme="@style/LinearLayoutHorizontalWeighted"
 
@@ -86,7 +86,7 @@
             android:layout_weight="8"
             />
 
-        <Space android:layout_weight="2" />
+        <Space android:layout_weight="1" />
 
         <fragment android:name="lab.star.surf_iot2015.TemperatureCardFragment"
 
@@ -96,7 +96,7 @@
             android:layout_weight="8"
             />
 
-        <Space android:layout_weight="2" />
+        <Space android:layout_weight="1" />
 
 
         <fragment android:name="lab.star.surf_iot2015.StepCountCardFragment"

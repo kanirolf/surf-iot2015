@@ -4,7 +4,9 @@ import android.content.Context;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,14 +24,13 @@ public class DataGraph {
     private static String TIMESTAMP = "timestamp";
     private static String DATA_POINTS = "data_points";
 
-    protected TreeMap<Long, String> data;
+    protected TreeMap<Long, String> data = new TreeMap<Long, String>();
     protected Context context;
     protected String dataGraphName;
 
     protected DataGraph (){}
 
-    public DataGraph (String name, Context context) throws GraphFileStructureError,
-            GraphFileParseError, GraphLengthMismatchError {
+    public DataGraph (String name, Context context) throws GraphFileParseError {
 
         this.context = context;
         this.dataGraphName = name;
@@ -38,10 +39,12 @@ public class DataGraph {
         ArrayList<String> dataPoints = new ArrayList<String>();
 
         try {
-            parseDataGraphJSON(context.openFileInput(name), timestamps, dataPoints);
+            FileInputStream dataGraphJSON = context.openFileInput(name);
+            parseDataGraphJSON(dataGraphJSON, timestamps, dataPoints);
+            dataGraphJSON.close();
         } catch (FileNotFoundException fileNotFoundEx){
         } catch (IOException ioEx){
-            throw new GraphFileParseError();
+        } catch (GraphFileParseError parseEx) {
         }
 
         populateData(timestamps, dataPoints);
@@ -71,8 +74,11 @@ public class DataGraph {
     // writes data from memory into JSON file
     public void closeDataGraph() throws GraphFileWriteError {
         try {
-            writeDataGraphJSON(context.openFileOutput(dataGraphName, Context.MODE_PRIVATE),
-                    new ArrayList<Long>(data.navigableKeySet()), new ArrayList<String>(data.values()));
+            FileOutputStream dataGraphJSON = context.openFileOutput(dataGraphName,
+                    Context.MODE_PRIVATE);
+            writeDataGraphJSON(dataGraphJSON, new ArrayList<Long>(data.navigableKeySet()),
+                    new ArrayList<String>(data.values()));
+            dataGraphJSON.close();
         } catch (IOException ioEx) {
             throw new GraphFileWriteError();
         }
@@ -80,7 +86,7 @@ public class DataGraph {
 
     // static methods for JSON file I/O
     private static void parseDataGraphJSON(InputStream in, List<Long> timestamps, List<String> data)
-        throws IOException, GraphFileStructureError, GraphLengthMismatchError {
+        throws IOException, GraphFileParseError {
 
         JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
 
@@ -163,7 +169,16 @@ public class DataGraph {
     }
 
     // Exceptions
-    public static class GraphLengthMismatchError extends Exception {
+
+    public static class GraphFileParseError extends Exception {
+        public static String DEFAULT_MESSAGE = "The file storing this DataGraph could not be read.";
+
+        public GraphFileParseError() { super(DEFAULT_MESSAGE); }
+        public GraphFileParseError(String message){ super(message); }
+
+    }
+
+    public static class GraphLengthMismatchError extends GraphFileParseError {
         public static String DEFAULT_MESSAGE = "The number of timestamps given does not match the " +
                 "number of data points.";
 
@@ -171,7 +186,7 @@ public class DataGraph {
 
     }
 
-    public static class GraphFileStructureError extends Exception {
+    public static class GraphFileStructureError extends GraphFileParseError {
         public static String DEFAULT_MESSAGE = "The file storing this DataGraph does not follow" +
                 "DataGraph storage protocol.";
 
@@ -179,12 +194,6 @@ public class DataGraph {
 
     }
 
-    public static class GraphFileParseError extends Exception {
-        public static String DEFAULT_MESSAGE = "The file storing this DataGraph could not be read.";
-
-        public GraphFileParseError() { super(DEFAULT_MESSAGE); }
-
-    }
 
     public static class GraphFileWriteError extends Exception {
         public static String DEFAULT_MESSAGE = "The DataGraph could not be written to a file.";

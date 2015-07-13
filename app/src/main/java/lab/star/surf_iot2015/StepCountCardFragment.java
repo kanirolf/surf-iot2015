@@ -8,24 +8,11 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.microsoft.band.BandClient;
-import com.microsoft.band.sensors.BandPedometerEvent;
-import com.microsoft.band.sensors.BandPedometerEventListener;
-
 // Specialization of DataCardFragment responsible for displaying step count
 public class StepCountCardFragment extends DataCardFragment {
 
-    @Override
-    public void registerClient(BandClient client) {
-        try {
-            client.getSensorManager().registerPedometerEventListener(new BandPedometerEventListener() {
-                @Override
-                public void onBandPedometerChanged(BandPedometerEvent bandPedometerEvent) {
-                    updateValue(bandPedometerEvent.getTotalSteps());
-                }
-            });
-        } catch (Exception ex) {
-        }
+    public void registerSensor(SensorListenerRegister sensorListenerRegister){
+        super.registerSensor(SensorService.PEDOMETER_SENSOR, sensorListenerRegister);
     }
 
     @Override
@@ -39,10 +26,14 @@ public class StepCountCardFragment extends DataCardFragment {
                 R.drawable.stepcount,
                 R.color.data_card_step_count);
 
+        view.findViewById(R.id.dataIdentifierSpacer).setLayoutParams(new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.MATCH_PARENT, 9f));
         view.findViewById(R.id.dataIdentifier).setLayoutParams(new LinearLayout.LayoutParams(0,
-                ViewGroup.LayoutParams.MATCH_PARENT, 3.5f));
+                ViewGroup.LayoutParams.MATCH_PARENT, 6f));
+        view.findViewById(R.id.dataIcon).setLayoutParams(new LinearLayout.LayoutParams(0,
+                ViewGroup.LayoutParams.MATCH_PARENT, 3f));
 
-        ((TextView) view.findViewById(R.id.dataValue)).setTextSize(TypedValue.COMPLEX_UNIT_DIP, 30);
+        ((TextView) view.findViewById(R.id.dataValue)).setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24);
 
         return view;
     }

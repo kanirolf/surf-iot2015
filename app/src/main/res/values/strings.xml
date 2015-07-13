@@ -44,4 +44,7 @@
     <!-- Strings for DataDetails -->
     <string name="data_details_enable_label">Enable this sensor?</string>
     <string name="data_details_warn_exceed_label">Warn me when this value exceeds</string>
+    <string name="title_activity_data_details">DataDetailsActivity</string>
+
+    <string name="hello_world">Hello world!</string>
 </resources>

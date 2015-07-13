@@ -33,11 +33,24 @@
             </intent-filter>
         </activity>
 
+
+        <activity
+            android:name=".DataDetailsActivity"
+            android:label="@string/title_activity_data_details"
+            android:theme="@android:style/Theme.Holo.NoActionBar"
+
+            android:parentActivityName=".MainDataConsoleActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="lab.star.surf_iot2015.MainDataConsoleActivity" />
+        </activity>
+
         <service
-            android:name=".SensorLongRunningService"
+            android:name=".SensorService"
             android:enabled="true"
             android:exported="true" >
         </service>
+
     </application>
 
 </manifest>

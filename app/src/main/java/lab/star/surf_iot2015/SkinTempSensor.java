@@ -15,12 +15,31 @@ public class SkinTempSensor extends Sensor {
 
     private static final String SENSOR_NAME = "SkinTemp";
 
+    private BandSkinTemperatureEventListener eventListener;
+
     SkinTempSensor (BandClient client, Context context){
         super(SENSOR_NAME, client, context);
     }
 
     @Override
     protected void enableResolution(){
+
+        eventListener = new BandSkinTemperatureEventListener() {
+            @Override
+            public void onBandSkinTemperatureChanged
+                    (BandSkinTemperatureEvent bandSkinTemperatureEvent) {
+
+                String valAsString = Double.toString(bandSkinTemperatureEvent.getTemperature());
+                data.addEntry(currentTimeMillis(),valAsString);
+
+                for (SensorServiceCallback callback : callbacks){
+                    try {
+                        callback.valueChanged(valAsString);
+                    } catch (RemoteException remoteEx){
+                    }
+                }
+            }
+        };
 
         try {
             client.getSensorManager().registerSkinTemperatureEventListener(eventListener);
@@ -29,29 +48,13 @@ public class SkinTempSensor extends Sensor {
     }
 
     @Override
-    protected void disableResolution(){
+    protected void disableResolution() {
 
         try {
             client.getSensorManager().unregisterSkinTemperatureEventListener(eventListener);
-        } catch (BandIOException bandIOex){
+        } catch (BandIOException bandIOex) {
         }
 
     }
-
-    private BandSkinTemperatureEventListener eventListener = new BandSkinTemperatureEventListener() {
-        @Override
-        public void onBandSkinTemperatureChanged(BandSkinTemperatureEvent bandSkinTemperatureEvent) {
-
-            String valAsString = Double.toString(bandSkinTemperatureEvent.getTemperature());
-            data.addEntry(currentTimeMillis(),valAsString);
-
-            for (SensorServiceCallback callback : callbacks){
-                try {
-                    callback.valueChanged(valAsString);
-                } catch (RemoteException remoteEx){
-                }
-            }
-        }
-    };
 
 }

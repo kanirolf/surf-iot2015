@@ -14,4 +14,6 @@
     <color name="data_detail_low_value_bg">#5588ff</color>
     <color name="data_details_warn_exceed_level_bg">#ececec</color>
 
+    <color name="data_static_minor_text_color">#929292</color>
+
 </resources>

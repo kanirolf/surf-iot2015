@@ -15,12 +15,30 @@ public class SkinContactSensor extends Sensor {
 
     private static final String SENSOR_NAME = "SkinContact";
 
+    private BandContactEventListener eventListener;
+
     SkinContactSensor (BandClient client, Context context){
         super(SENSOR_NAME, client, context);
     }
 
     @Override
     protected void enableResolution(){
+
+        eventListener = new BandContactEventListener() {
+            @Override
+            public void onBandContactChanged(BandContactEvent bandContactEvent) {
+
+                String valAsString = bandContactEvent.getContactState().toString();
+                data.addEntry(currentTimeMillis(),valAsString);
+
+                for (SensorServiceCallback callback : callbacks){
+                    try {
+                        callback.valueChanged(valAsString);
+                    } catch (RemoteException remoteEx){
+                    }
+                }
+            }
+        };
 
         try {
             client.getSensorManager().registerContactEventListener(eventListener);
@@ -37,21 +55,5 @@ public class SkinContactSensor extends Sensor {
         }
 
     }
-
-    private BandContactEventListener eventListener = new BandContactEventListener() {
-        @Override
-        public void onBandContactChanged(BandContactEvent bandContactEvent) {
-
-            String valAsString = bandContactEvent.getContactState().toString();
-            data.addEntry(currentTimeMillis(),valAsString);
-
-            for (SensorServiceCallback callback : callbacks){
-                try {
-                    callback.valueChanged(valAsString);
-                } catch (RemoteException remoteEx){
-                }
-            }
-        }
-    };
 
 }

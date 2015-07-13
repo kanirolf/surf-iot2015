@@ -2,9 +2,13 @@ package lab.star.surf_iot2015;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.ComponentName;
 import android.content.DialogInterface;
-import android.os.AsyncTask;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +24,9 @@ import com.microsoft.band.BandClientManager;
 import com.microsoft.band.BandException;
 import com.microsoft.band.BandInfo;
 import com.microsoft.band.ConnectionState;
+import com.microsoft.band.UserConsent;
+import com.microsoft.band.sensors.BandContactState;
+import com.microsoft.band.sensors.HeartRateConsentListener;
 
 
 public class MainDataConsoleActivity extends Activity {
@@ -30,7 +37,8 @@ public class MainDataConsoleActivity extends Activity {
     private Space bandIsOnSpacer;
     private TextView bandIsOnStatus;
 
-    private BandClient client;
+    private SensorBandConnector bandConnectorInterface;
+    private SensorListenerRegister bandListenerRegisterInterface;
 
     @Override
     protected void onCreate (Bundle savedInstanceState) {
@@ -42,7 +50,23 @@ public class MainDataConsoleActivity extends Activity {
         bandIsOnSpacer = (Space) findViewById(R.id.bandIsOnSpacer);
         bandIsOnStatus = (TextView) findViewById(R.id.bandIsOnStatus);
 
-        checkBandPaired();
+        Intent sensorService = new Intent(this, SensorService.class);
+        startService(sensorService);
+
+    }
+
+    @Override
+    public void onResume(){
+        super.onResume();
+
+        if (bandConnectorInterface == null) {
+            Intent sensorService = new Intent(this, SensorService.class)
+                    .setAction(SensorService.GET_CONNECTOR);
+
+            bindService(sensorService, sensorConnectorConnection, BIND_WAIVE_PRIORITY);
+        } else {
+            activateDataConsole();
+        }
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -55,13 +79,30 @@ public class MainDataConsoleActivity extends Activity {
     //  any data is read or listeners registered.
     // ---------------------------------------------------------------------------------------------
 
+    private ServiceConnection sensorConnectorConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            bandConnectorInterface = SensorBandConnector.Stub.asInterface(iBinder);
+            try {
+                checkBandPaired();
+            } catch (RemoteException remoteEx){
+                Log.d("sensorConnectorConnect", "failed", remoteEx);
+            }
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+                bandConnectorInterface = null;
+        }
+    };
+
     // checks that a Band is paired; if not, shows the user a dialog indicating so
-    private void checkBandPaired(){
-      if (BandClientManager.getInstance().getPairedBands().length > 0){
-          new connectToBand().execute();
-      } else {
-          showBandNotPaired();
-      }
+    private void checkBandPaired() throws RemoteException {
+        if (bandConnectorInterface.bandPaired()){
+            connectToBand();
+        } else {
+            showBandNotPaired();
+        }
     };
 
     // connects to the Band; if the connection is unsuccessful (without raising an Exception,)
@@ -70,55 +111,154 @@ public class MainDataConsoleActivity extends Activity {
     //
     // note that Band connection must be done on a separate thread, since connection may hang
     // UI thread (although connecting feels rather instantaneous for me)
-    private class connectToBand extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params){
-            if (client == null){
-                BandInfo[] pairedBands = BandClientManager.getInstance().getPairedBands();
-                client = BandClientManager.getInstance().create(getBaseContext(), pairedBands[0]);
-                try {
-                    if (client.connect().await() != ConnectionState.CONNECTED){
-                        showBandNotConnected();
-                    } else {
-                        activateDataConsole();
+
+    private void connectToBand () {
+        try {
+            if (!bandConnectorInterface.bandConnected()) {
+                bandConnectorInterface.connectToBand(new SensorConnectCallback() {
+                    @Override
+                    public void getResult(String string) {
+                        try {
+                            if (Enum.valueOf(ConnectionState.class, string) != ConnectionState.CONNECTED) {
+                                showBandNotConnected();
+                            } else {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        activateDataConsole();
+                                    }
+                                });
+                            }
+                        } catch (Exception ex) {
+                            Log.e("connectToBand", "error", ex);
+                        }
                     }
-                } catch (BandException bandEx){
-                    Log.d("MainDataConsoleActivity.java:connectToBand", "Exception occurred", bandEx);
-                } catch (Exception ex){
-                    Log.d("MainDataConsoleActivity.java:connectToBand", "Exception occurred", ex);
-                }
+
+                    @Override
+                    public IBinder asBinder() {
+                        return null;
+                    }
+                });
+            } else {
+                activateDataConsole();
             }
-            return null;
+        } catch (RemoteException remoteEx){
+            Log.d("connectToBand", "something wrong", remoteEx);
         }
     }
+
+
 
     // ungreys the activity and registers the listeners for Band contact (i.e. is the Band on?),
     // Band connection, and probably listeners for each of the data panels (although they should
     // be Fragments to simplify things)
     private void activateDataConsole (){
+        Log.d("activateDataConsole", "called");
         // set the overlay that greys the Console out to not be drawn
         findViewById(R.id.dataConsoleInactiveOverlay).setVisibility(View.GONE);
 
         // pass the client to each to register event listeners when sensor values change.
         // see DataCardFragment (and subsequent classes) for more details
-        try {
-            ((DataCardFragment) getFragmentManager().findFragmentById(R.id.heartRateCard))
-                    .registerClient(client);
-            ((DataCardFragment) getFragmentManager().findFragmentById(R.id.skinTempCard))
-                    .registerClient(client);
-            ((DataCardFragment) getFragmentManager().findFragmentById(R.id.stepCountCard))
-                    .registerClient(client);
-        } catch (Exception ex){
+        if (bandListenerRegisterInterface == null) {
+            try {
+                Intent sensorListenerRegisterIntent = new Intent(this, SensorService.class);
+                sensorListenerRegisterIntent.setAction(SensorService.GET_LISTENER_REGISTERER);
 
+                bindService(sensorListenerRegisterIntent, sensorListenerRegisterConnector,
+                        BIND_WAIVE_PRIORITY);
+            } catch (Exception ex) {
+
+            }
+        } else {
+            attachListeners();
         }
     }
 
+    private void attachListeners (){
+        try {
+            if (bandConnectorInterface != null && bandConnectorInterface.bandConnected()) {
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        BandInfo band = BandClientManager.getInstance().getPairedBands()[0];
+                        BandClient client = BandClientManager.getInstance().create(
+                                MainDataConsoleActivity.this, band);
+                        try {
+                            if (client.connect().await() == ConnectionState.CONNECTED) {
+                                if (client.getSensorManager().getCurrentHeartRateConsent() !=
+                                        UserConsent.GRANTED) {
+                                    client.getSensorManager().requestHeartRateConsent(
+                                            MainDataConsoleActivity.this, new HeartRateConsentListener() {
+                                                @Override
+                                                public void userAccepted(boolean b) {
+                                                    ((DataCardFragment) getFragmentManager()
+                                                            .findFragmentById(R.id.heartRateCard))
+                                                            .registerSensor(bandListenerRegisterInterface);
+                                                }
+                                            }
+                                    );
+                                } else {
+                                    ((DataCardFragment) getFragmentManager()
+                                            .findFragmentById(R.id.heartRateCard))
+                                            .registerSensor(bandListenerRegisterInterface);
+                                }
+                            }
+                        } catch (InterruptedException interruptEx) {
+                        } catch (BandException bandEx) {
+                        }
+                    }
+                }).start();
+            }
+        } catch (RemoteException remoteEx){
+        }
+
+        ((DataCardFragment) getFragmentManager().findFragmentById(R.id.skinTempCard))
+                .registerSensor(bandListenerRegisterInterface);
+        ((DataCardFragment) getFragmentManager().findFragmentById(R.id.stepCountCard))
+                .registerSensor(bandListenerRegisterInterface);
+
+        try {
+            bandListenerRegisterInterface.registerListener(SensorService.SKIN_CONTACT_SENSOR,
+                    new SensorServiceCallback() {
+                        @Override
+                        public void valueChanged(String newValue) throws RemoteException {
+                            switch (Enum.valueOf(BandContactState.class, newValue)) {
+                                case WORN:
+                                    bandIsOn();
+                                    break;
+                                case NOT_WORN:
+                                    bandIsOff();
+                                    break;
+                            }
+                        }
+
+                        @Override
+                        public IBinder asBinder() {
+                            return null;
+                        }
+                    });
+        } catch (RemoteException ex) {
+        }
+    }
+
+    private ServiceConnection sensorListenerRegisterConnector  = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            bandListenerRegisterInterface = SensorListenerRegister.Stub.asInterface(iBinder);
+            attachListeners();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+            bandListenerRegisterInterface = null;
+        }
+    };
 
     // ---------------------------------------------------------------------------------------------
     //  Methods for transitioning between band on and band off
     // ---------------------------------------------------------------------------------------------
 
-    private void bandIsOff (){
+    private void bandIsOn (){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -140,7 +280,7 @@ public class MainDataConsoleActivity extends Activity {
         });
     }
 
-    private void bandIsOn (){
+    private void bandIsOff (){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -191,11 +331,15 @@ public class MainDataConsoleActivity extends Activity {
                 .show();
     }
 
-    private void showBandNotPaired(){
+    private void showBandNotPaired() {
         showBandErrorDialog(R.layout.dialog_check_band_paired, new DialogCallback() {
             @Override
             public void doCallback() {
-                checkBandPaired();
+                try {
+                    checkBandPaired();
+                } catch (RemoteException remoteEx){
+                    Log.d("showBandNotPaired", "failed", remoteEx);
+                }
             }
         });
     }
@@ -204,7 +348,11 @@ public class MainDataConsoleActivity extends Activity {
         showBandErrorDialog(R.layout.dialog_check_band_connected, new DialogCallback() {
             @Override
             public void doCallback() {
-                new connectToBand().execute();
+//                try {
+                    connectToBand();
+//                } catch (RemoteException remoteEx){
+//                    Log.d("showBandNotConnected", "failed", remoteEx);
+//                }
             }
         });
     }

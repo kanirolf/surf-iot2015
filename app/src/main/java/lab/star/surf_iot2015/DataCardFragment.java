@@ -1,33 +1,57 @@
 package lab.star.surf_iot2015;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.LayerDrawable;
+import android.hardware.*;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.microsoft.band.BandClient;
 
 // Base Fragment class for data cards: elements that are responsible for displaying sensor data
 // Don't use this directly; subclass it and override onCreateView to personalize it. :D
-public class DataCardFragment extends Fragment {
+public abstract class DataCardFragment extends Fragment {
+
+    protected String sensor;
+
+    protected SensorListenerRegister sensorListenerRegister;
+    protected SensorServiceCallback sensorServiceCallback = new SensorServiceCallback() {
+        @Override
+        public void valueChanged(String newValue) throws RemoteException {
+            updateValue(newValue);
+        }
+
+        @Override
+        public IBinder asBinder() {
+            return null;
+        }
+    };
 
     private TextView valueDisplay;
 
-    public DataCardFragment newInstance (){
-        return new DataCardFragment();
-    }
+    abstract public void registerSensor(SensorListenerRegister sensorListenerRegister);
 
     // this should be called to use the Band's sensor listeners to update the DataCard's state.
     // since each entry uses a different sensor, this must be implemented on an individual level
-    public void registerClient (BandClient client) throws Exception {
-        throw new Exception("DataCardFragment subclass does not implement a register method.");
+    protected void registerSensor(String sensor, SensorListenerRegister sensorListenerRegister){
+        this.sensor = sensor;
+        this.sensorListenerRegister = sensorListenerRegister;
+        try {
+            sensorListenerRegister.registerListener(sensor, sensorServiceCallback);
+        } catch (RemoteException remoteEx){
+        }
     }
 
     // retrieves the base data card layout from fragment_data_card.xml. call super.onCreateView()
@@ -55,32 +79,39 @@ public class DataCardFragment extends Fragment {
 
         ((ImageView) toDecorate.findViewById(R.id.dataIcon)).setImageResource(iconImage);
 
-        LayerDrawable bkgd = (LayerDrawable)
-                toDecorate.findViewById(R.id.dataDisplayContainer).getBackground();
+        ((LinearLayout) toDecorate.findViewById(R.id.dataDisplayContainer))
+                .setBackgroundColor(getResources().getColor(color));
 
-        for (int layer = 0; layer < bkgd.getNumberOfLayers(); ++layer){
-            ((GradientDrawable) bkgd.getDrawable(layer)).setColor(
-                    getResources().getColor(color)
-            );
-        }
+        LinearLayout dataDetailsButton = (LinearLayout) toDecorate.findViewById(R.id.dataDetailsButton);
+
+        dataDetailsButton.setOnClickListener(
+            new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(new Intent(getActivity(), DataDetailsActivity.class));
+                }
+            });
+
         return toDecorate;
     }
 
-    // either updateValue should be called to update the value displayed by the fragment
-    protected void updateValue (final float value){
-        getActivity().runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                valueDisplay.setText(Float.toString(value));
+    @Override
+    public void onPause(){
+        super.onPause();
+        if (sensorListenerRegister != null){
+            try {
+                sensorListenerRegister.unregisterListener(sensor, sensorServiceCallback);
+            } catch (RemoteException remoteEx){
             }
-        });
+        }
     }
 
-    protected void updateValue (final int value){
+    // either updateValue should be called to update the value displayed by the fragment
+    private void updateValue (final String value){
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                valueDisplay.setText(Integer.toString(value));
+                valueDisplay.setText(value);
             }
         });
     }

@@ -6,6 +6,6 @@ package lab.star.surf_iot2015;
 import lab.star.surf_iot2015.SensorServiceCallback;
 
 interface SensorListenerRegister {
-    int registerListener(SensorServiceCallback callback);
-    void unregisterListener(int callbackID);
+    void registerListener(String sensor, SensorServiceCallback callback);
+    void unregisterListener(String sensor, SensorServiceCallback callbackID);
 }
