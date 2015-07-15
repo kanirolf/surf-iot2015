@@ -1,15 +1,15 @@
-package lab.star.surf_iot2015;
+package lab.star.surf_iot2015.sensor;
 
 import android.content.Context;
 import android.os.RemoteException;
-import android.util.Log;
 
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandException;
 import com.microsoft.band.BandIOException;
 import com.microsoft.band.sensors.BandHeartRateEvent;
 import com.microsoft.band.sensors.BandHeartRateEventListener;
-import com.microsoft.band.sensors.HeartRateConsentListener;
+
+import lab.star.surf_iot2015.SensorServiceCallback;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -20,7 +20,7 @@ public class HeartRateSensor extends Sensor {
 
     private BandHeartRateEventListener eventListener;
 
-    HeartRateSensor (BandClient client, Context context){
+    public HeartRateSensor (BandClient client, Context context){
         super(SENSOR_NAME, client, context);
     }
 

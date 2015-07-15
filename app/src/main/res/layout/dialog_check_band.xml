@@ -1,7 +1,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
 
     android:orientation="vertical">
 
@@ -13,14 +13,14 @@
         android:padding="20dp"
         android:orientation="vertical">
 
-        <ImageButton android:id="@+id/startPairButton"
+        <ImageView android:id="@+id/dialog_check_band_icon"
 
             android:layout_height="200dp"
             android:layout_width="wrap_content"
 
             android:background="@android:color/transparent"
             android:scaleType="fitCenter"
-            android:src="@drawable/band_not_paired"
+            android:src="@android:color/white"
             />
 
         <Space
@@ -34,9 +34,9 @@
             android:textSize="20dp"
             android:textStyle="bold"
             android:textColor="@android:color/white"
-            android:text="@string/dialog_check_band_paired_warning"
+            android:text=""
 
-            />
+            android:id="@+id/dialog_check_band_warning" />
 
     </LinearLayout>
 
@@ -55,8 +55,8 @@
 
             android:textSize="20dp"
             android:textColor="#555555"
-            android:text="@string/dialog_check_band_paired_detail"
-            />
+            android:text=""
+            android:id="@+id/dialog_check_band_detail" />
 
         <Space
             android:layout_width="match_parent"
@@ -69,8 +69,8 @@
 
             android:textSize="20dp"
             android:textColor="#555555"
-            android:text="@string/dialog_check_band_paired_request"
-            />
+            android:text=""
+            android:id="@+id/dialog_check_band_request" />
 
     </LinearLayout>
 

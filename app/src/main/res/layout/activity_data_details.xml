@@ -8,7 +8,7 @@
     tools:context="lab.star.surf_iot2015.DataDetailsActivity"
     android:background="@color/negative">
 
-    <fragment android:name="lab.star.surf_iot2015.HeartRateCardFragment"
+    <fragment android:name="lab.star.surf_iot2015.data_card_fragment.HeartRateCardFragment"
 
         android:layout_height="0dp"
         android:layout_width="match_parent"
@@ -17,13 +17,13 @@
         tools:layout="@layout/fragment_data_card"
         android:id="@+id/dataCard" />
 
-    <fragment android:name="lab.star.surf_iot2015.HeartRateDetailsFragment"
+    <fragment android:name="lab.star.surf_iot2015.data_settings_fragment.HeartRateSettingsFragment"
 
         android:layout_width="match_parent"
         android:layout_height="0dp"
 
         android:layout_weight="30"
-        tools:layout="@layout/fragment_data_details"
+        tools:layout="@layout/fragment_data_settings"
         android:id="@+id/dataDetails" />
 
 

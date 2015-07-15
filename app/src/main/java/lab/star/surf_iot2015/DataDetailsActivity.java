@@ -7,8 +7,9 @@ import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
+
+import lab.star.surf_iot2015.data_card_fragment.HeartRateCardFragment;
+import lab.star.surf_iot2015.data_settings_fragment.HeartRateSettingsFragment;
 
 
 public class DataDetailsActivity extends Activity {
@@ -17,7 +18,7 @@ public class DataDetailsActivity extends Activity {
     private SensorListenerRegister sensorListenerRegister;
 
     private HeartRateCardFragment heartRateCardFragment;
-    private HeartRateDetailsFragment heartRateDetailsFragment;
+    private HeartRateSettingsFragment heartRateDetailsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,7 @@ public class DataDetailsActivity extends Activity {
 
         heartRateCardFragment = (HeartRateCardFragment)
                 getFragmentManager().findFragmentById(R.id.dataCard);
-        heartRateDetailsFragment = (HeartRateDetailsFragment)
+        heartRateDetailsFragment = (HeartRateSettingsFragment)
                 getFragmentManager().findFragmentById(R.id.dataDetails);
 
     }

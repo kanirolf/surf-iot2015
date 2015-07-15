@@ -3,9 +3,9 @@
     android:orientation="vertical"
 
     android:layout_width="match_parent"
-    android:layout_height="390dp"
+    android:layout_height="410dp"
 
-    android:weightSum="39">
+    android:weightSum="41">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -26,7 +26,7 @@
             android:layout_width="100dp"
             android:layout_height="match_parent"
 
-            android:layout_weight="10"
+            android:layout_weight="11"
 
             android:gravity="center|start"
 
@@ -39,7 +39,7 @@
             android:layout_width="180dp"
             android:layout_height="match_parent"
 
-            android:layout_weight="18" />
+            android:layout_weight="17" />
 
         <CheckBox
             android:layout_width="wrap_content"
@@ -55,11 +55,17 @@
 
     </LinearLayout>
 
+    <Space
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+
+        android:layout_weight="1" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
 
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="20dp"
 
         android:layout_weight="5"
 
@@ -233,11 +239,17 @@
 
     </LinearLayout>
 
+    <Space
+        android:layout_height="0dp"
+        android:layout_width="match_parent"
+
+        android:layout_weight="1" />
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="0dp"
 
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="20dp"
 
         android:layout_weight="5"
 
@@ -293,7 +305,10 @@
             android:layout_weight="4"
 
             android:textSize="20dp"
-            android:gravity="center_vertical|start"
+            android:fontFamily="sans-serif"
+            android:gravity="center"
+            android:textColor="@color/data_static_minor_text_color"
+            android:textStyle="bold"
             />
 
         <Space
@@ -314,19 +329,20 @@
             android:text="@string/data_card_heart_rate_data_units"
             android:textColor="@color/data_static_minor_text_color" />
 
-        <CheckBox
+        <CheckBox android:id="@+id/sensorThresholdSet"
+
             android:layout_width="0dp"
             android:layout_height="wrap_content"
 
             android:layout_gravity="center"
 
-            android:layout_weight="2"/>
+            android:layout_weight="2.5"/>
 
         <Space
             android:layout_width="0dp"
             android:layout_height="match_parent"
 
-            android:layout_weight="1" />
+            android:layout_weight="0.5" />
 
     </LinearLayout>
 

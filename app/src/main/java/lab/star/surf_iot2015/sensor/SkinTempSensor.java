@@ -1,4 +1,4 @@
-package lab.star.surf_iot2015;
+package lab.star.surf_iot2015.sensor;
 
 import android.content.Context;
 import android.os.RemoteException;
@@ -7,6 +7,8 @@ import com.microsoft.band.BandClient;
 import com.microsoft.band.BandIOException;
 import com.microsoft.band.sensors.BandSkinTemperatureEvent;
 import com.microsoft.band.sensors.BandSkinTemperatureEventListener;
+
+import lab.star.surf_iot2015.SensorServiceCallback;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -17,7 +19,7 @@ public class SkinTempSensor extends Sensor {
 
     private BandSkinTemperatureEventListener eventListener;
 
-    SkinTempSensor (BandClient client, Context context){
+    public SkinTempSensor (BandClient client, Context context){
         super(SENSOR_NAME, client, context);
     }
 

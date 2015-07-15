@@ -1,4 +1,4 @@
-package lab.star.surf_iot2015;
+package lab.star.surf_iot2015.data_card_fragment;
 
 import android.os.Bundle;
 import android.util.TypedValue;
@@ -7,6 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import lab.star.surf_iot2015.R;
+import lab.star.surf_iot2015.SensorListenerRegister;
+import lab.star.surf_iot2015.SensorService;
 
 // Specialization of DataCardFragment responsible for displaying step count
 public class StepCountCardFragment extends DataCardFragment {

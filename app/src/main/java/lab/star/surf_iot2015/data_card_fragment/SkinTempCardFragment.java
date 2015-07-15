@@ -1,19 +1,17 @@
-package lab.star.surf_iot2015;
+package lab.star.surf_iot2015.data_card_fragment;
 
 import android.os.Bundle;
-import android.os.IBinder;
-import android.os.RemoteException;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.microsoft.band.BandClient;
-import com.microsoft.band.sensors.BandSkinTemperatureEvent;
-import com.microsoft.band.sensors.BandSkinTemperatureEventListener;
+import lab.star.surf_iot2015.R;
+import lab.star.surf_iot2015.SensorListenerRegister;
+import lab.star.surf_iot2015.SensorService;
 
 // Specialization of DataCardFragment responsible for displaying skin temperature
-public class TemperatureCardFragment extends DataCardFragment {
+public class SkinTempCardFragment extends DataCardFragment {
 
     public void registerSensor(SensorListenerRegister sensorListenerRegister){
         super.registerSensor(SensorService.SKIN_TEMP_SENSOR, sensorListenerRegister);

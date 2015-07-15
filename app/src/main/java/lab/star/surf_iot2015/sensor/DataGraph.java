@@ -1,4 +1,4 @@
-package lab.star.surf_iot2015;
+package lab.star.surf_iot2015.sensor;
 
 import android.content.Context;
 import android.util.JsonReader;
@@ -94,7 +94,7 @@ public class DataGraph {
 
         if (reader.nextName() != TIMESTAMP){
             throw new GraphFileStructureError();
-        };
+        }
 
         try {
             reader.beginArray();
@@ -110,7 +110,7 @@ public class DataGraph {
 
         if (reader.nextName() != DATA_POINTS){
             throw new GraphFileStructureError();
-        };
+        }
 
         try {
             reader.beginArray();

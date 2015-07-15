@@ -1,4 +1,4 @@
-package lab.star.surf_iot2015;
+package lab.star.surf_iot2015.sensor;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -8,6 +8,8 @@ import com.microsoft.band.BandClient;
 
 import java.util.ArrayList;
 import java.util.NavigableMap;
+
+import lab.star.surf_iot2015.SensorServiceCallback;
 
 public abstract class Sensor {
 

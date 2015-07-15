@@ -2,6 +2,7 @@ package lab.star.surf_iot2015;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Fragment;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -28,6 +29,10 @@ import com.microsoft.band.UserConsent;
 import com.microsoft.band.sensors.BandContactState;
 import com.microsoft.band.sensors.HeartRateConsentListener;
 
+import lab.star.surf_iot2015.check_band_dialog.CheckBandOnDialog;
+import lab.star.surf_iot2015.check_band_dialog.CheckBandPairedDialog;
+import lab.star.surf_iot2015.data_card_fragment.DataCardFragment;
+
 
 public class MainDataConsoleActivity extends Activity {
 
@@ -40,6 +45,8 @@ public class MainDataConsoleActivity extends Activity {
     private SensorBandConnector bandConnectorInterface;
     private SensorListenerRegister bandListenerRegisterInterface;
 
+    // gets the Views responsible for displaying Skin Contact (i.e. the Views at the top of the
+    // screen that say "band is on" or "band is off" and starts SensorService
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -103,7 +110,7 @@ public class MainDataConsoleActivity extends Activity {
         } else {
             showBandNotPaired();
         }
-    };
+    }
 
     // connects to the Band; if the connection is unsuccessful (without raising an Exception,)
     // this shows a dialog telling the user the Band cannot connect (usually because the Band
@@ -124,16 +131,13 @@ public class MainDataConsoleActivity extends Activity {
                             } else {
                                 runOnUiThread(new Runnable() {
                                     @Override
-                                    public void run() {
-                                        activateDataConsole();
-                                    }
+                                    public void run() { activateDataConsole();}
                                 });
                             }
                         } catch (Exception ex) {
                             Log.e("connectToBand", "error", ex);
                         }
                     }
-
                     @Override
                     public IBinder asBinder() {
                         return null;
@@ -153,7 +157,6 @@ public class MainDataConsoleActivity extends Activity {
     // Band connection, and probably listeners for each of the data panels (although they should
     // be Fragments to simplify things)
     private void activateDataConsole (){
-        Log.d("activateDataConsole", "called");
         // set the overlay that greys the Console out to not be drawn
         findViewById(R.id.dataConsoleInactiveOverlay).setVisibility(View.GONE);
 
@@ -306,63 +309,24 @@ public class MainDataConsoleActivity extends Activity {
     // ---------------------------------------------------------------------------------------------
     //  Methods for displaying dialogs
     // ---------------------------------------------------------------------------------------------
-    //
-    //  showBandErrorDialog takes a resource ID representing a layout and a callback. Each method
-    //  following that is simply a specialization for each dialog that needs to be raised.
-    // ---------------------------------------------------------------------------------------------
-
-    // Interface for passing callbacks
-    private interface DialogCallback {
-        public void doCallback();
-    }
-
-    private void showBandErrorDialog(int layoutID, final DialogCallback callback){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-
-        builder.setView(inflater.inflate(layoutID, null))
-                .setPositiveButton("OK", new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog, int which){
-                        callback.doCallback();
-                    }
-                })
-                .create()
-                .show();
-    }
 
     private void showBandNotPaired() {
-        showBandErrorDialog(R.layout.dialog_check_band_paired, new DialogCallback() {
+        CheckBandPairedDialog dialogFragment = new CheckBandPairedDialog();
+        dialogFragment.getDialog().setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
-            public void doCallback() {
+            public void onDismiss(DialogInterface dialogInterface) {
                 try {
                     checkBandPaired();
-                } catch (RemoteException remoteEx){
+                } catch (RemoteException remoteEx) {
                     Log.d("showBandNotPaired", "failed", remoteEx);
                 }
             }
         });
-    }
-
-    private void showBandNotConnected(){
-        showBandErrorDialog(R.layout.dialog_check_band_connected, new DialogCallback() {
-            @Override
-            public void doCallback() {
-//                try {
-                    connectToBand();
-//                } catch (RemoteException remoteEx){
-//                    Log.d("showBandNotConnected", "failed", remoteEx);
-//                }
-            }
-        });
+        dialogFragment.show(getFragmentManager(), "BandNotPaired");
     }
 
     private void showBandNotOn(){
-        showBandErrorDialog(R.layout.dialog_check_band_on, new DialogCallback() {
-            @Override
-            public void doCallback() {
-            }
-        });
+        new CheckBandOnDialog().show(getFragmentManager(), "BandNotOn");
     }
 
 }

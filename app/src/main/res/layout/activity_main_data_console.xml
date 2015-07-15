@@ -78,7 +78,7 @@
 
         </LinearLayout>
 
-        <fragment android:name="lab.star.surf_iot2015.HeartRateCardFragment"
+        <fragment android:name="lab.star.surf_iot2015.data_card_fragment.HeartRateCardFragment"
 
             android:id="@+id/heartRateCard"
             tools:layout="@layout/fragment_data_card"
@@ -88,7 +88,7 @@
 
         <Space android:layout_weight="1" />
 
-        <fragment android:name="lab.star.surf_iot2015.TemperatureCardFragment"
+        <fragment android:name="lab.star.surf_iot2015.data_card_fragment.SkinTempCardFragment"
 
             android:id="@+id/skinTempCard"
             tools:layout="@layout/fragment_data_card"
@@ -99,7 +99,7 @@
         <Space android:layout_weight="1" />
 
 
-        <fragment android:name="lab.star.surf_iot2015.StepCountCardFragment"
+        <fragment android:name="lab.star.surf_iot2015.data_card_fragment.StepCountCardFragment"
 
             android:id="@+id/stepCountCard"
             tools:layout="@layout/fragment_data_card"

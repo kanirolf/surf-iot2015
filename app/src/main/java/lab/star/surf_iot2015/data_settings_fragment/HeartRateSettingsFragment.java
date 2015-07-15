@@ -1,11 +1,10 @@
-package lab.star.surf_iot2015;
+package lab.star.surf_iot2015.data_settings_fragment;
 
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.os.Bundle;
 import android.os.RemoteException;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,17 +13,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.Map;
-import java.util.NavigableMap;
 import java.util.TreeMap;
+
+import lab.star.surf_iot2015.R;
+import lab.star.surf_iot2015.SensorDataReader;
+import lab.star.surf_iot2015.SensorService;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.ceil;
-import static java.lang.Math.floor;
 import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.max;
 import static java.util.Collections.min;
 
-public class HeartRateDetailsFragment extends DataDetailsFragment implements SurfaceHolder.Callback {
+public class HeartRateSettingsFragment extends DataSettingsFragment implements SurfaceHolder.Callback {
 
     private static final int SCALE_PADDING = 100;
 
@@ -41,6 +42,7 @@ public class HeartRateDetailsFragment extends DataDetailsFragment implements Sur
         highValueText = (TextView) view.findViewById(R.id.dataDetailsHigh);
         avgValueText = (TextView) view.findViewById(R.id.dataDetailsAvg);
         lowValueText = (TextView) view.findViewById(R.id.dataDetailsLow);
+
 
         ((SurfaceView) view.findViewById(R.id.graphView)).getHolder().addCallback(this);
 
@@ -130,12 +132,14 @@ public class HeartRateDetailsFragment extends DataDetailsFragment implements Sur
             lineLowPaint.setStrokeWidth(5f);
 
 
-            graphCanvas.drawRGB(0xCC, 0xCC, 0xCC);
+            graphCanvas.drawRGB(0xFF, 0xFF, 0xFF);
 
             for (int i = 2; i < graphDeciScale; i += 2){
                 graphCanvas.drawLine(SCALE_PADDING, graphHeight - i * 10 * unitPixelRatio,
                         SCALE_PADDING + graphWidth,
                         graphHeight - i * 10 * unitPixelRatio, scalePaint);
+                graphCanvas.drawText(Integer.toString(i * 10), 10,
+                        graphHeight - (i * 10 * unitPixelRatio - 25), scalePaint);
             }
 
             Map.Entry<Long, Long> entry, nextEntry;
@@ -169,18 +173,7 @@ public class HeartRateDetailsFragment extends DataDetailsFragment implements Sur
                 entryToNext.setFillType(Path.FillType.WINDING);
 
                 graphCanvas.drawPath(entryToNext, toPaint);
-//                graphCanvas.drawLine(
-//                        (float) (SCALE_PADDING + abs(currentTime - entry.getKey()) * timePixelRatio),
-//                        graphHeight - entry.getValue() * unitPixelRatio,
-//                        (float) (SCALE_PADDING + abs(currentTime - nextEntry.getKey()) * timePixelRatio),
-//                        graphHeight - nextEntry.getValue() * unitPixelRatio, linePaint);
             }
-
-            for (int i = 2; i < graphDeciScale; i += 2) {
-                graphCanvas.drawText(Integer.toString(i * 10), 10,
-                        graphHeight - (i * 10 * unitPixelRatio - 25), scalePaint);
-            }
-
 
             surfaceHolder.unlockCanvasAndPost(graphCanvas);
 
