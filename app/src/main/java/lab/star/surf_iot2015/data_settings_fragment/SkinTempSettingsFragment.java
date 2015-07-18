@@ -19,24 +19,24 @@ import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.max;
 import static java.util.Collections.min;
 
-public class HeartRateSettingsFragment extends DataSettingsFragment {
+public class SkinTempSettingsFragment extends DataSettingsFragment {
 
     private static final int SCALE_PADDING = 100;
 
     @Override
     protected String getSensorType(){
-        return Sensor.HEART_RATE_SENSOR;
+        return Sensor.SKIN_TEMP_SENSOR;
     }
 
     @Override
     protected void onDataChange(SensorDataReader sensorDataReader){
-        TreeMap<Long, Long> dataAsLong = getDataFromReader(sensorDataReader);
+        TreeMap<Long, Float> dataAsFloat = getDataFromReader(sensorDataReader);
 
         Canvas canvas = surfaceHolder.lockCanvas();
-        drawGraph(dataAsLong, canvas);
+        drawGraph(dataAsFloat, canvas);
         surfaceHolder.unlockCanvasAndPost(canvas);
 
-        drawStats(dataAsLong, highValueText, lowValueText, avgValueText);
+        drawStats(dataAsFloat, highValueText, lowValueText, avgValueText);
     }
 
     @Override
@@ -70,15 +70,15 @@ public class HeartRateSettingsFragment extends DataSettingsFragment {
         }
     }
 
-    protected TreeMap<Long, Long> getDataFromReader(SensorDataReader sensorDataReader){
+    protected TreeMap<Long, Float> getDataFromReader(SensorDataReader sensorDataReader){
         Map<Long, String> stringMap;
-        TreeMap<Long, Long> longMap = new TreeMap<Long, Long>();
+        TreeMap<Long, Float> longMap = new TreeMap<Long, Float>();
 
         try {
             stringMap = (Map<Long, String>) sensorDataReader
                     .findEntriesUpTo(getSensorType(), currentTimeMillis() - 60000);
             for (Map.Entry<Long, String> entry: stringMap.entrySet()){
-                longMap.put(entry.getKey(), Long.valueOf(entry.getValue()));
+                longMap.put(entry.getKey(), Float.valueOf(entry.getValue()));
             }
         } catch (RemoteException remoteEx){
         }
@@ -86,21 +86,21 @@ public class HeartRateSettingsFragment extends DataSettingsFragment {
         return longMap;
     }
 
-    protected static void drawStats(TreeMap<Long, Long> data, TextView highView, TextView lowView,
+    protected static void drawStats(TreeMap<Long, Float> data, TextView highView, TextView lowView,
                              TextView avgView){
-        highView.setText(Long.toString(max(data.values())));
+        highView.setText(String.format("%.2f", max(data.values())));
 
         double average = 0;
-        for (Long value : data.values()){
+        for (Float value : data.values()){
             average += value;
         }
         average /= data.size();
 
         avgView.setText(String.format("%.2f", average));
-        lowView.setText(Long.toString(min(data.values())));
+        lowView.setText(String.format("%.2f", min(data.values())));
     }
 
-    protected static void drawGraph(TreeMap<Long, Long> data, Canvas canvas){
+    protected static void drawGraph(TreeMap<Long, Float> data, Canvas canvas){
         long currentTime = currentTimeMillis();
 
         int graphWidth = canvas.getWidth() - SCALE_PADDING;
@@ -121,9 +121,9 @@ public class HeartRateSettingsFragment extends DataSettingsFragment {
                     graphHeight - (i * 10 * unitPixelRatio - 25), getScalePaint());
         }
 
-        Map.Entry<Long, Long> entry, nextEntry;
+        Map.Entry<Long, Float> entry, nextEntry;
         for (entry = data.firstEntry(); (nextEntry = data.higherEntry(entry.getKey())) != null;
-                entry = nextEntry){
+             entry = nextEntry){
             Paint toPaint = getLineNeutralPaint();
             double slope = 1000 * (entry.getValue() - nextEntry.getValue()) /
                     (float) (entry.getKey() - nextEntry.getKey());

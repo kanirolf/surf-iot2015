@@ -31,7 +31,7 @@ public class SkinTempSensor extends Sensor {
             public void onBandSkinTemperatureChanged
                     (BandSkinTemperatureEvent bandSkinTemperatureEvent) {
 
-                String valAsString = Double.toString(bandSkinTemperatureEvent.getTemperature());
+                String valAsString = Float.toString(bandSkinTemperatureEvent.getTemperature());
                 data.addEntry(currentTimeMillis(), valAsString);
 
                 for (SensorServiceCallback callback : callbacks){

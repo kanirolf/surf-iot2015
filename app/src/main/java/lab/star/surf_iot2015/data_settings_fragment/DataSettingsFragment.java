@@ -161,6 +161,7 @@ abstract public class DataSettingsFragment extends Fragment
             listenerRegister.registerListener(getSensorType(), dataChangeCallback);
         } catch (RemoteException remoteEx) {
         }
+
     }
 
     // Paints are here (sorry it's as verbose as it is.)

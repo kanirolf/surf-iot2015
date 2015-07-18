@@ -15,13 +15,15 @@ import android.widget.TextView;
 import com.microsoft.band.sensors.BandContactState;
 
 import lab.star.surf_iot2015.data_card_fragment.DataCardFragment;
+import lab.star.surf_iot2015.data_card_fragment.StepCountCardFragment;
 import lab.star.surf_iot2015.dialogs.CheckBandOnDialog;
 import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.service_user.DataReaderUser;
 import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
 
 
 public class MainDataConsoleActivity extends BandActivity
-        implements ListenerRegistererUser, HeartRateConsentDelegate {
+        implements ListenerRegistererUser, DataReaderUser, HeartRateConsentDelegate {
 
     private LinearLayout dataConsoleMood;
 
@@ -68,6 +70,7 @@ public class MainDataConsoleActivity extends BandActivity
             }
         });
         getHeartRateConsent(this);
+        getDataReader(this);
     }
 
     @Override
@@ -118,6 +121,11 @@ public class MainDataConsoleActivity extends BandActivity
         }
     }
 
+    @Override
+    public void onAcquireDataReader(SensorDataReader dataReader){
+        ((StepCountCardFragment) getFragmentManager().findFragmentById(R.id.stepCountCard))
+                .onAcquireDataReader(dataReader);
+    }
 
     // ---------------------------------------------------------------------------------------------
     //  Methods for transitioning between band on and band off

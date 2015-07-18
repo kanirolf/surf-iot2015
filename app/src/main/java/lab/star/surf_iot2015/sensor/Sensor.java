@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.microsoft.band.BandClient;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.NavigableMap;
 
@@ -35,7 +36,7 @@ public abstract class Sensor {
     private String name;
 
     protected DataGraph data;
-    protected ArrayList<SensorServiceCallback> callbacks = new ArrayList<SensorServiceCallback>();
+    protected ArrayDeque<SensorServiceCallback> callbacks = new ArrayDeque<SensorServiceCallback>();
 
     Sensor (String sensorName, BandClient newClient, Context newContext){
         name = sensorName;

@@ -1,9 +1,19 @@
 package lab.star.surf_iot2015;
 
+import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.text.Layout;
+import android.view.ViewGroup;
 
+import lab.star.surf_iot2015.data_card_fragment.DataCardFragment;
 import lab.star.surf_iot2015.data_card_fragment.HeartRateCardFragment;
+import lab.star.surf_iot2015.data_card_fragment.SkinTempCardFragment;
+import lab.star.surf_iot2015.data_card_fragment.StepCountCardFragment;
+import lab.star.surf_iot2015.data_settings_fragment.DataSettingsFragment;
 import lab.star.surf_iot2015.data_settings_fragment.HeartRateSettingsFragment;
+import lab.star.surf_iot2015.data_settings_fragment.SkinTempSettingsFragment;
+import lab.star.surf_iot2015.data_settings_fragment.StepCountSettingsFragment;
+import lab.star.surf_iot2015.sensor.Sensor;
 import lab.star.surf_iot2015.service_user.DataReaderUser;
 import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
 import lab.star.surf_iot2015.service_user.SensorTogglerUser;
@@ -12,19 +22,40 @@ import lab.star.surf_iot2015.service_user.SensorTogglerUser;
 public class DataDetailsActivity extends BandActivity
     implements ListenerRegistererUser, DataReaderUser, SensorTogglerUser {
 
-    private HeartRateCardFragment heartRateCardFragment;
-    private HeartRateSettingsFragment heartRateDetailsFragment;
+    public static final String SENSOR_SPECIFIER = "lab.star.surf_iot2015.SENSOR_SPECIFIER";
+
+    private DataCardFragment dataCardFragment;
+    private DataSettingsFragment dataSettingsFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_data_details);
+        ViewGroup activityLayout = (ViewGroup)
+                getLayoutInflater().inflate(R.layout.activity_data_details, null);
 
-        heartRateCardFragment = (HeartRateCardFragment)
-                getFragmentManager().findFragmentById(R.id.dataCard);
-        heartRateDetailsFragment = (HeartRateSettingsFragment)
-                getFragmentManager().findFragmentById(R.id.dataDetails);
+        switch (getIntent().getStringExtra(SENSOR_SPECIFIER)){
+            case Sensor.HEART_RATE_SENSOR:
+                dataCardFragment = new HeartRateCardFragment();
+                dataSettingsFragment = new HeartRateSettingsFragment();
+                break;
+            case Sensor.SKIN_TEMP_SENSOR:
+                dataCardFragment = new SkinTempCardFragment();
+                dataSettingsFragment = new SkinTempSettingsFragment();
+                break;
+            case Sensor.PEDOMETER_SENSOR:
+                dataCardFragment = new StepCountCardFragment();
+                dataSettingsFragment = new StepCountSettingsFragment();
+                break;
+        }
+
+        getFragmentManager().beginTransaction()
+                .add(R.id.dataCard, dataCardFragment)
+                .add(R.id.dataSettings, dataSettingsFragment)
+                .commit();
+
+        setContentView(activityLayout);
+
 
         initializeService();
     }
@@ -46,18 +77,18 @@ public class DataDetailsActivity extends BandActivity
 
     @Override
     public void onAcquireDataReader(SensorDataReader sensorDataReader){
-        heartRateDetailsFragment.onAcquireDataReader(sensorDataReader);
+        dataSettingsFragment.onAcquireDataReader(sensorDataReader);
     }
 
     @Override
     public void onAcquireListenerRegisterer(SensorListenerRegister sensorListenerRegister){
-        heartRateCardFragment.onAcquireListenerRegisterer(sensorListenerRegister);
-        heartRateDetailsFragment.onAcquireListenerRegisterer(sensorListenerRegister);
+        dataCardFragment.onAcquireListenerRegisterer(sensorListenerRegister);
+        dataSettingsFragment.onAcquireListenerRegisterer(sensorListenerRegister);
     }
 
     @Override
     public void onAcquireSensorToggler(SensorToggler sensorToggler){
-        heartRateDetailsFragment.onAcquireSensorToggler(sensorToggler);
+        dataSettingsFragment.onAcquireSensorToggler(sensorToggler);
     }
 
 }

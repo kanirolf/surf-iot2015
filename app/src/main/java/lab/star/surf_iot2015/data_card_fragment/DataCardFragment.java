@@ -59,8 +59,10 @@ public abstract class DataCardFragment extends Fragment implements ListenerRegis
                         if (getActivity() instanceof DataDetailsActivity){
                             getActivity().finish();
                         } else {
-                            getActivity().startActivity(new Intent(getActivity(),
-                                    DataDetailsActivity.class));
+                            getActivity().startActivity(
+                                    new Intent(getActivity(), DataDetailsActivity.class)
+                                            .putExtra(DataDetailsActivity.SENSOR_SPECIFIER,
+                                                    getSensorType()));
                         }
                     }
                 });
@@ -124,7 +126,7 @@ public abstract class DataCardFragment extends Fragment implements ListenerRegis
     }
 
     // updateValue should be called to update the value displayed by the fragment
-    private void updateValue (final String value){
+    protected void updateValue (final String value){
         getActivity().runOnUiThread(new Runnable() {
             @Override
             public void run() {
