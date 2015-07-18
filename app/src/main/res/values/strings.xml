@@ -41,4 +41,11 @@
         <string name="data_card_step_count_data_units">steps</string>
         <string name="data_card_step_count_data_identifier">Step Count</string>
 
+    <!-- Strings for DataDetails -->
+    <string name="data_details_enable_label">Enable this sensor?</string>
+    <string name="data_details_warn_exceed_label">Warn me when this value exceeds</string>
+    <string name="title_activity_data_details">DataDetailsActivity</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_heart_rate_consent">HeartRateConsentActivity</string>
 </resources>

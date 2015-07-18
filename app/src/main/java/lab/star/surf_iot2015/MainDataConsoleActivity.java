@@ -1,12 +1,9 @@
 package lab.star.surf_iot2015;
 
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.DialogInterface;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -15,14 +12,18 @@ import android.widget.LinearLayout.LayoutParams;
 import android.widget.Space;
 import android.widget.TextView;
 
-import com.microsoft.band.BandClient;
-import com.microsoft.band.BandClientManager;
-import com.microsoft.band.BandException;
-import com.microsoft.band.BandInfo;
-import com.microsoft.band.ConnectionState;
+import com.microsoft.band.sensors.BandContactState;
+
+import lab.star.surf_iot2015.data_card_fragment.DataCardFragment;
+import lab.star.surf_iot2015.data_card_fragment.StepCountCardFragment;
+import lab.star.surf_iot2015.dialogs.CheckBandOnDialog;
+import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.service_user.DataReaderUser;
+import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
 
 
-public class MainDataConsoleActivity extends Activity {
+public class MainDataConsoleActivity extends BandActivity
+        implements ListenerRegistererUser, DataReaderUser, HeartRateConsentDelegate {
 
     private LinearLayout dataConsoleMood;
 
@@ -30,8 +31,11 @@ public class MainDataConsoleActivity extends Activity {
     private Space bandIsOnSpacer;
     private TextView bandIsOnStatus;
 
-    private BandClient client;
+    private boolean heartRateConsent = false;
 
+
+    // gets the Views responsible for displaying Skin Contact (i.e. the Views at the top of the
+    // screen that say "band is on" or "band is off" and starts STARAppService
     @Override
     protected void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,83 +46,92 @@ public class MainDataConsoleActivity extends Activity {
         bandIsOnSpacer = (Space) findViewById(R.id.bandIsOnSpacer);
         bandIsOnStatus = (TextView) findViewById(R.id.bandIsOnStatus);
 
-        checkBandPaired();
+        initializeService();
+
     }
 
-    // ---------------------------------------------------------------------------------------------
-    //  Methods run to connect to Band
-    // ---------------------------------------------------------------------------------------------
-    //  These methods are run in descending order:
-    //  checkBandPaired -> connectToBand -> activateDataConsole
-    //
-    //  The Band must be paired before it is connected, and connected before
-    //  any data is read or listeners registered.
-    // ---------------------------------------------------------------------------------------------
+    @Override
+    public void onResume(){
+        super.onResume();
 
-    // checks that a Band is paired; if not, shows the user a dialog indicating so
-    private void checkBandPaired(){
-      if (BandClientManager.getInstance().getPairedBands().length > 0){
-          new connectToBand().execute();
-      } else {
-          showBandNotPaired();
-      }
-    };
-
-    // connects to the Band; if the connection is unsuccessful (without raising an Exception,)
-    // this shows a dialog telling the user the Band cannot connect (usually because the Band
-    // is far away from the phone)
-    //
-    // note that Band connection must be done on a separate thread, since connection may hang
-    // UI thread (although connecting feels rather instantaneous for me)
-    private class connectToBand extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params){
-            if (client == null){
-                BandInfo[] pairedBands = BandClientManager.getInstance().getPairedBands();
-                client = BandClientManager.getInstance().create(getBaseContext(), pairedBands[0]);
-                try {
-                    if (client.connect().await() != ConnectionState.CONNECTED){
-                        showBandNotConnected();
-                    } else {
-                        activateDataConsole();
-                    }
-                } catch (BandException bandEx){
-                    Log.d("MainDataConsoleActivity.java:connectToBand", "Exception occurred", bandEx);
-                } catch (Exception ex){
-                    Log.d("MainDataConsoleActivity.java:connectToBand", "Exception occurred", ex);
-                }
-            }
-            return null;
-        }
+        connectToBand();
     }
 
     // ungreys the activity and registers the listeners for Band contact (i.e. is the Band on?),
     // Band connection, and probably listeners for each of the data panels (although they should
     // be Fragments to simplify things)
-    private void activateDataConsole (){
-        // set the overlay that greys the Console out to not be drawn
-        findViewById(R.id.dataConsoleInactiveOverlay).setVisibility(View.GONE);
+    @Override
+    public void onBandConnectSuccess(){
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                // set the overlay that greys the Console out to not be drawn
+                findViewById(R.id.dataConsoleInactiveOverlay).setVisibility(View.GONE);
+            }
+        });
+        getHeartRateConsent(this);
+        getDataReader(this);
+    }
 
-        // pass the client to each to register event listeners when sensor values change.
-        // see DataCardFragment (and subsequent classes) for more details
-        try {
+    @Override
+    public void onHeartRateConsentYes(){
+        Log.d("MainDataConsoleActivity", "heart rate consent yes!");
+        heartRateConsent = true;
+        getListenerRegisterer(this);
+    }
+
+    @Override
+    public void onHeartRateConsentNo(){
+        getListenerRegisterer(this);
+    }
+
+    @Override
+    public void onAcquireListenerRegisterer (SensorListenerRegister sensorListenerRegister){
+
+        if (heartRateConsent) {
             ((DataCardFragment) getFragmentManager().findFragmentById(R.id.heartRateCard))
-                    .registerClient(client);
-            ((DataCardFragment) getFragmentManager().findFragmentById(R.id.skinTempCard))
-                    .registerClient(client);
-            ((DataCardFragment) getFragmentManager().findFragmentById(R.id.stepCountCard))
-                    .registerClient(client);
-        } catch (Exception ex){
+                    .onAcquireListenerRegisterer(sensorListenerRegister);
+        }
+        ((DataCardFragment) getFragmentManager().findFragmentById(R.id.skinTempCard))
+                .onAcquireListenerRegisterer(sensorListenerRegister);
+        ((DataCardFragment) getFragmentManager().findFragmentById(R.id.stepCountCard))
+                .onAcquireListenerRegisterer(sensorListenerRegister);
 
+        try {
+            sensorListenerRegister.registerListener(Sensor.SKIN_CONTACT_SENSOR,
+                new SensorServiceCallback() {
+                    @Override
+                    public void valueChanged(String newValue) throws RemoteException {
+                        switch (Enum.valueOf(BandContactState.class, newValue)) {
+                            case WORN:
+                                bandIsOn();
+                                break;
+                            case NOT_WORN:
+                                bandIsOff();
+                                break;
+                        }
+                    }
+
+                    @Override
+                    public IBinder asBinder() {
+                        return null;
+                    }
+                });
+        } catch (RemoteException ex) {
         }
     }
 
+    @Override
+    public void onAcquireDataReader(SensorDataReader dataReader){
+        ((StepCountCardFragment) getFragmentManager().findFragmentById(R.id.stepCountCard))
+                .onAcquireDataReader(dataReader);
+    }
 
     // ---------------------------------------------------------------------------------------------
     //  Methods for transitioning between band on and band off
     // ---------------------------------------------------------------------------------------------
 
-    private void bandIsOff (){
+    private void bandIsOn (){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -140,7 +153,7 @@ public class MainDataConsoleActivity extends Activity {
         });
     }
 
-    private void bandIsOn (){
+    private void bandIsOff (){
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -166,55 +179,9 @@ public class MainDataConsoleActivity extends Activity {
     // ---------------------------------------------------------------------------------------------
     //  Methods for displaying dialogs
     // ---------------------------------------------------------------------------------------------
-    //
-    //  showBandErrorDialog takes a resource ID representing a layout and a callback. Each method
-    //  following that is simply a specialization for each dialog that needs to be raised.
-    // ---------------------------------------------------------------------------------------------
-
-    // Interface for passing callbacks
-    private interface DialogCallback {
-        public void doCallback();
-    }
-
-    private void showBandErrorDialog(int layoutID, final DialogCallback callback){
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-
-        builder.setView(inflater.inflate(layoutID, null))
-                .setPositiveButton("OK", new DialogInterface.OnClickListener(){
-                    @Override
-                    public void onClick(DialogInterface dialog, int which){
-                        callback.doCallback();
-                    }
-                })
-                .create()
-                .show();
-    }
-
-    private void showBandNotPaired(){
-        showBandErrorDialog(R.layout.dialog_check_band_paired, new DialogCallback() {
-            @Override
-            public void doCallback() {
-                checkBandPaired();
-            }
-        });
-    }
-
-    private void showBandNotConnected(){
-        showBandErrorDialog(R.layout.dialog_check_band_connected, new DialogCallback() {
-            @Override
-            public void doCallback() {
-                new connectToBand().execute();
-            }
-        });
-    }
 
     private void showBandNotOn(){
-        showBandErrorDialog(R.layout.dialog_check_band_on, new DialogCallback() {
-            @Override
-            public void doCallback() {
-            }
-        });
+        new CheckBandOnDialog().show(getFragmentManager(), "BandNotOn");
     }
 
 }

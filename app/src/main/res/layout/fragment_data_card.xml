@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:layout_width="match_parent"
 
-    android:weightSum="28">
+    android:weightSum="32">
 
     <LinearLayout android:id="@+id/dataDisplayContainer"
 
@@ -12,8 +12,6 @@
         android:layout_width="0dp"
 
         android:layout_weight="8"
-
-        android:background="@drawable/round15dpwhite_left_bkgd"
 
         android:orientation="vertical"
 
@@ -45,7 +43,7 @@
 
             android:layout_weight="1.5"
 
-            android:text="" />
+            android:text="bpm" />
 
     </LinearLayout>
 
@@ -54,13 +52,12 @@
         android:layout_height="match_parent"
         android:layout_width="0dp"
 
-        android:layout_weight="20"
+        android:layout_weight="19"
 
-        android:background="@drawable/round15dpwhite_right_bkgd"
+        android:weightSum="19"
+        android:background="@android:color/white">
 
-        android:weightSum="20">
-
-        <Space
+        <Space android:id="@+id/dataIdentifierSpacer"
 
             android:layout_height="match_parent"
             android:layout_width="0dp"
@@ -74,7 +71,7 @@
 
             style="@style/SensorDataConsole_DataIdentifier"
 
-            android:layout_weight="14"
+            android:layout_weight="13"
 
             android:text="" />
 
@@ -89,10 +86,33 @@
             android:layout_height="match_parent"
             android:layout_width="0dp"
 
-            android:layout_weight="3.5"
+            android:layout_weight="5"
 
             android:src="@android:color/white" />
 
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="5"
+        android:weightSum="5"
+        android:id="@+id/dataDetailsButton"
+        android:background="@android:color/white">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2.5" />
+
+        <ImageView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:id="@+id/imageView"
+            android:layout_weight=".5"
+            android:src="@drawable/more_vert_black"
+            android:scaleType="fitCenter" />
     </LinearLayout>
 
 </LinearLayout>
