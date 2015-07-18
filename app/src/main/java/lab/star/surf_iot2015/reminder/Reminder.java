@@ -114,6 +114,11 @@ public class Reminder {
 
     }
 
+    public Reminder setName(String name){
+        this.name = name;
+        return this;
+    }
+
     public Reminder setReminderText(String reminderText){
         this.reminderText = reminderText;
         return this;
