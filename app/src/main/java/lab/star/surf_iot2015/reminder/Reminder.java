@@ -1,8 +1,11 @@
 package lab.star.surf_iot2015.reminder;
 
 import android.content.Context;
+import android.os.IBinder;
+import android.os.RemoteException;
 import android.util.JsonReader;
 import android.util.JsonWriter;
+import android.util.Log;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,6 +15,15 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
 import java.util.Collection;
+import java.util.TreeSet;
+
+import lab.star.surf_iot2015.SensorDataReader;
+import lab.star.surf_iot2015.SensorListenerRegister;
+import lab.star.surf_iot2015.SensorServiceCallback;
+
+import static java.lang.System.currentTimeMillis;
+import static java.util.Collections.max;
+import static java.util.Collections.min;
 
 public class Reminder {
 
@@ -30,6 +42,9 @@ public class Reminder {
     private long activeTimeEnd = -1;
 
     private Collection<Trigger> triggers = null;
+
+    private SensorDataReader dataReader;
+    private SensorListenerRegister listenerRegister;
 
     public Reminder (String name){
         this.name = name;
@@ -66,7 +81,7 @@ public class Reminder {
                     newReminder.triggers = new ArrayDeque<Trigger>();
                     reminderReader.beginArray();
                     while(reminderReader.hasNext()){
-                        newReminder.triggers.add(Trigger.parseTrigger(reminderReader));
+                        newReminder.triggers.add(Trigger.parseTrigger(newReminder, reminderReader));
                     }
                     reminderReader.endArray();
                     break;
@@ -114,6 +129,14 @@ public class Reminder {
 
     }
 
+    public void registerReminder(SensorListenerRegister listenerRegister, SensorDataReader dataReader){
+        for (Trigger trigger : triggers){
+            trigger.registerTrigger(listenerRegister, dataReader);
+        }
+        this.listenerRegister = listenerRegister;
+        this.dataReader = dataReader;
+    }
+
     public Reminder setName(String name){
         this.name = name;
         return this;
@@ -125,21 +148,43 @@ public class Reminder {
     }
 
     public Reminder removeReminderText(){
-        this.reminderText = null;
+        this.reminderText = "";
         return this;
     }
 
     public Reminder addTrigger(Trigger trigger){
         triggers.add(trigger);
+        if (listenerRegister != null && dataReader != null) {
+            trigger.registerTrigger(listenerRegister, dataReader);
+        }
         return this;
     }
 
     public Reminder removeTrigger(Trigger trigger){
         triggers.remove(trigger);
+        trigger.unregisterTrigger();
         return this;
     }
 
-    public static class Trigger {
+    private void onTriggerValueChange(){
+        boolean reminderTriggered = true;
+        for (Trigger trigger : triggers){
+            reminderTriggered &= trigger.isTriggered();
+        }
+        if (!reminderTriggered){
+            return;
+        }
+
+        Log.d(String.format("Reminder (%s):", name), reminderText);
+    }
+
+    public static class Trigger implements SensorServiceCallback {
+
+        public static final int THRESHOLD_ABOVE = 0;
+        public static final int THRESHOLD_BELOW = 1;
+
+        public static final int THRESHOLD_RISING = 2;
+        public static final int THRESHOLD_FALLING = 3;
 
         private static final String SENSOR_TYPE = "sensorType";
         private static final String THRESHOLD_TYPE = "thresholdType";
@@ -148,12 +193,21 @@ public class Reminder {
         private static final String DURATION = "duration";
 
         private String sensorType;
-        private String thresholdType;
+        private int thresholdType;
 
         private double threshold;
         private long duration;
 
-        public Trigger (String sensorType, String thresholdType, double threshold, long duration){
+        private boolean isTriggered = false;
+
+        private Reminder reminder;
+
+        private SensorListenerRegister listenerRegister;
+        private SensorDataReader dataReader;
+
+        public Trigger (Reminder reminder, String sensorType, int thresholdType, double threshold, long duration){
+            this.reminder = reminder;
+
             this.sensorType = sensorType;
             this.thresholdType = thresholdType;
 
@@ -161,9 +215,69 @@ public class Reminder {
             this.duration = duration;
         }
 
-        private static Trigger parseTrigger(JsonReader jsonReader) throws IOException{
+        @Override
+        public void valueChanged(String newValue){
+            boolean triggerValue = false;
+
+            switch (thresholdType){
+                case THRESHOLD_ABOVE:
+                    triggerValue = Double.valueOf(newValue) > threshold;
+                    break;
+                case THRESHOLD_BELOW:
+                    triggerValue = Double.valueOf(newValue) < threshold;
+                    break;
+                case THRESHOLD_RISING:
+                case THRESHOLD_FALLING:
+                    TreeSet<Long> data = null;
+                    try {
+                        for(String dataPoint : (Collection<String>) dataReader.findEntriesUpTo(sensorType,
+                                currentTimeMillis() - duration).values()){
+                            data.add(Long.valueOf(dataPoint));
+                        }
+                    } catch (RemoteException remoteEx){
+                    }
+
+                    triggerValue = thresholdType == THRESHOLD_RISING ? max(data) - min(data) > threshold :
+                            max(data) - min(data) < threshold;
+                    break;
+            }
+
+            if (triggerValue != isTriggered){
+                isTriggered = triggerValue;
+                reminder.onTriggerValueChange();
+            }
+
+        }
+
+        public IBinder asBinder(){ return null; }
+
+        private boolean isTriggered(){
+            return isTriggered;
+        }
+
+        private void registerTrigger(SensorListenerRegister listenerRegister,
+                                     SensorDataReader dataReader){
+            this.dataReader = dataReader;
+            this.listenerRegister = listenerRegister;
+
+            try {
+                this.listenerRegister.registerListener(sensorType, this);
+            } catch (RemoteException remoteEx){
+            }
+        }
+
+        private void unregisterTrigger(){
+            if (listenerRegister != null) {
+                try {
+                    listenerRegister.unregisterListener(sensorType, this);
+                } catch (RemoteException remoteEx) {
+                }
+            }
+        }
+
+        private static Trigger parseTrigger(Reminder reminder, JsonReader jsonReader) throws IOException {
             String sensorType = null;
-            String thresholdType = null;
+            int thresholdType = 0;
 
             double threshold = 0;
             long duration = 0;
@@ -176,7 +290,7 @@ public class Reminder {
                         sensorType = jsonReader.nextString();
                         break;
                     case THRESHOLD_TYPE:
-                        thresholdType = jsonReader.nextString();
+                        thresholdType = jsonReader.nextInt();
                         break;
                     case THRESHOLD:
                         threshold = jsonReader.nextDouble();
@@ -187,7 +301,7 @@ public class Reminder {
                 }
             }
 
-            return new Trigger(sensorType, thresholdType, threshold, duration);
+            return new Trigger(reminder, sensorType, thresholdType, threshold, duration);
         }
 
         private static void writeTrigger(JsonWriter jsonWriter, Trigger trigger) throws IOException {
@@ -202,6 +316,7 @@ public class Reminder {
             jsonWriter.endObject();
 
         }
+
     }
 
 }
