@@ -22,6 +22,8 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+
+        <!-- actual activities -->
         <activity
             android:name=".MainDataConsoleActivity"
             android:label="@string/app_name"
@@ -32,21 +34,28 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-
         <activity
             android:name=".DataDetailsActivity"
             android:label="@string/title_activity_data_details"
-            android:theme="@android:style/Theme.Holo.NoActionBar"
-
-            android:parentActivityName=".MainDataConsoleActivity" >
+            android:parentActivityName=".MainDataConsoleActivity"
+            android:theme="@android:style/Theme.Holo.NoActionBar" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="lab.star.surf_iot2015.MainDataConsoleActivity" />
         </activity>
 
+        <activity
+            android:name=".HeartRateConsentActivity"
+            android:label="@string/title_activity_heart_rate_consent"
+            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"
+            android:excludeFromRecents="true"
+            android:noHistory="true">
+
+        </activity>
+
+
         <service
-            android:name=".SensorService"
+            android:name=".STARAppService"
             android:enabled="true"
             android:exported="true" >
         </service>

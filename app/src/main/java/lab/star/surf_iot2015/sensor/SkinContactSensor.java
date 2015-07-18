@@ -15,7 +15,7 @@ import static java.lang.System.currentTimeMillis;
 
 public class SkinContactSensor extends Sensor {
 
-    private static final String SENSOR_NAME = "SkinContact";
+    private static final String SENSOR_NAME = SKIN_CONTACT_SENSOR;
 
     private BandContactEventListener eventListener;
 
@@ -51,9 +51,11 @@ public class SkinContactSensor extends Sensor {
     @Override
     protected void disableResolution(){
 
-        try {
-            client.getSensorManager().unregisterContactEventListener(eventListener);
-        } catch (BandIOException bandIOex){
+        if (eventListener != null) {
+            try {
+                client.getSensorManager().unregisterContactEventListener(eventListener);
+            } catch (BandIOException bandIOex) {
+            }
         }
 
     }

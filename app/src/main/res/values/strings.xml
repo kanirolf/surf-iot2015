@@ -47,4 +47,5 @@
     <string name="title_activity_data_details">DataDetailsActivity</string>
 
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_heart_rate_consent">HeartRateConsentActivity</string>
 </resources>

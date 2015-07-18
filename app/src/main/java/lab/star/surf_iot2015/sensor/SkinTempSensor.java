@@ -15,7 +15,7 @@ import static java.lang.System.currentTimeMillis;
 
 public class SkinTempSensor extends Sensor {
 
-    private static final String SENSOR_NAME = "SkinTemp";
+    private static final String SENSOR_NAME = SKIN_TEMP_SENSOR;
 
     private BandSkinTemperatureEventListener eventListener;
 
@@ -32,7 +32,7 @@ public class SkinTempSensor extends Sensor {
                     (BandSkinTemperatureEvent bandSkinTemperatureEvent) {
 
                 String valAsString = Double.toString(bandSkinTemperatureEvent.getTemperature());
-                data.addEntry(currentTimeMillis(),valAsString);
+                data.addEntry(currentTimeMillis(), valAsString);
 
                 for (SensorServiceCallback callback : callbacks){
                     try {
@@ -52,9 +52,11 @@ public class SkinTempSensor extends Sensor {
     @Override
     protected void disableResolution() {
 
-        try {
-            client.getSensorManager().unregisterSkinTemperatureEventListener(eventListener);
-        } catch (BandIOException bandIOex) {
+        if (eventListener != null) {
+            try {
+                client.getSensorManager().unregisterSkinTemperatureEventListener(eventListener);
+            } catch (BandIOException bandIOex) {
+            }
         }
 
     }

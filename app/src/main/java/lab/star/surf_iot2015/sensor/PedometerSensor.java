@@ -15,7 +15,7 @@ import static java.lang.System.currentTimeMillis;
 
 public class PedometerSensor extends Sensor {
 
-    private static final String SENSOR_NAME = "Pedometer";
+    private static final String SENSOR_NAME = PEDOMETER_SENSOR;
 
     private BandPedometerEventListener eventListener;
 
@@ -51,9 +51,11 @@ public class PedometerSensor extends Sensor {
     @Override
     protected void disableResolution(){
 
-        try {
-            client.getSensorManager().unregisterPedometerEventListener(eventListener);
-        } catch (BandIOException bandIOex){
+        if (eventListener != null) {
+            try {
+                client.getSensorManager().unregisterPedometerEventListener(eventListener);
+            } catch (BandIOException bandIOex) {
+            }
         }
 
     }

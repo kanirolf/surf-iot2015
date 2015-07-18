@@ -41,7 +41,8 @@
 
             android:layout_weight="17" />
 
-        <CheckBox
+        <CheckBox android:id="@+id/toggleSensor"
+
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
 

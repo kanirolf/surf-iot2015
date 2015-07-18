@@ -1,23 +1,17 @@
 package lab.star.surf_iot2015.data_settings_fragment;
 
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.os.Bundle;
 import android.os.RemoteException;
-import android.view.LayoutInflater;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.Map;
 import java.util.TreeMap;
 
-import lab.star.surf_iot2015.R;
 import lab.star.surf_iot2015.SensorDataReader;
-import lab.star.surf_iot2015.SensorService;
+import lab.star.surf_iot2015.sensor.Sensor;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.ceil;
@@ -25,166 +19,139 @@ import static java.lang.System.currentTimeMillis;
 import static java.util.Collections.max;
 import static java.util.Collections.min;
 
-public class HeartRateSettingsFragment extends DataSettingsFragment implements SurfaceHolder.Callback {
+public class HeartRateSettingsFragment extends DataSettingsFragment {
 
     private static final int SCALE_PADDING = 100;
 
-    private TextView highValueText;
-    private TextView lowValueText;
-    private TextView avgValueText;
-
-    private SurfaceHolder surfaceHolder;
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
-        View view =  super.onCreateView(inflater, container, savedInstanceState);
-
-        highValueText = (TextView) view.findViewById(R.id.dataDetailsHigh);
-        avgValueText = (TextView) view.findViewById(R.id.dataDetailsAvg);
-        lowValueText = (TextView) view.findViewById(R.id.dataDetailsLow);
-
-
-        ((SurfaceView) view.findViewById(R.id.graphView)).getHolder().addCallback(this);
-
-        return view;
+    protected String getSensorType(){
+        return Sensor.HEART_RATE_SENSOR;
     }
 
     @Override
-    public void surfaceCreated(SurfaceHolder holder){
-        surfaceHolder = holder;
+    protected void onDataChange(SensorDataReader sensorDataReader){
+        TreeMap<Long, Long> dataAsLong = getDataFromReader(sensorDataReader);
+
+        Canvas canvas = surfaceHolder.lockCanvas();
+        drawGraph(dataAsLong, canvas);
+        surfaceHolder.unlockCanvasAndPost(canvas);
+
+        drawStats(dataAsLong, highValueText, lowValueText, avgValueText);
     }
 
     @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height){
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key){
+        super.onSharedPreferenceChanged(sharedPreferences, key);
 
+        if (!sharedPreferences.getBoolean(getSensorType(), false)){
+            Canvas canvas = surfaceHolder.lockCanvas();
+
+            int graphHeight = canvas.getHeight();
+            int graphWidth = canvas.getWidth();
+
+            int graphDeciHeight = graphHeight / 10;
+
+            canvas.drawRGB(0xDD, 0xDD, 0xDD);
+
+            for (int i = 2; i < 10; i += 2){
+                canvas.drawLine(SCALE_PADDING, graphHeight - graphDeciHeight * i,
+                        SCALE_PADDING + graphWidth,
+                        graphHeight - graphDeciHeight * i, getScaleLinePaint());
+                canvas.drawText(Integer.toString(i * 10), 10,
+                        graphHeight - graphDeciHeight * i + 25, getScalePaint());
+            }
+
+            surfaceHolder.unlockCanvasAndPost(canvas);
+
+            highValueText.setText("--");
+            lowValueText.setText("--");
+            avgValueText.setText("--");
+
+        }
     }
 
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder){
-        surfaceHolder = null;
-    }
-
-
-    public void renderFromDataReader(SensorDataReader sensorDataReader){
-        TreeMap<Long, String> data = null;
+    protected TreeMap<Long, Long> getDataFromReader(SensorDataReader sensorDataReader){
+        Map<Long, String> stringMap;
+        TreeMap<Long, Long> longMap = new TreeMap<Long, Long>();
 
         try {
-            data = new TreeMap<Long, String>(sensorDataReader.findEntriesUpTo(SensorService.HEART_RATE_SENSOR,
-                    currentTimeMillis() - 60000));
-
-        } catch (RemoteException ex){
+            stringMap = (Map<Long, String>) sensorDataReader
+                    .findEntriesUpTo(getSensorType(), currentTimeMillis() - 60000);
+            for (Map.Entry<Long, String> entry: stringMap.entrySet()){
+                longMap.put(entry.getKey(), Long.valueOf(entry.getValue()));
+            }
+        } catch (RemoteException remoteEx){
         }
 
-        TreeMap<Long, Long> dataAsLong = stringToLong(data);
-
-        statisticsIntoView(dataAsLong);
-        dataIntoGraphView(dataAsLong);
-
+        return longMap;
     }
 
-    private void statisticsIntoView(TreeMap<Long, Long> data){
-        highValueText.setText(Long.toString(max(data.values())));
+    protected void drawStats(TreeMap<Long, Long> data, TextView highView, TextView lowView,
+                             TextView avgView){
+        highView.setText(Long.toString(max(data.values())));
 
         double average = 0;
-
-        int counter = 0;
         for (Long value : data.values()){
             average += value;
         }
         average /= data.size();
 
-        avgValueText.setText(String.format("%.2f", average));
-        lowValueText.setText(Long.toString(min(data.values())));
+        avgView.setText(String.format("%.2f", average));
+        lowView.setText(Long.toString(min(data.values())));
     }
 
-    private void dataIntoGraphView(TreeMap<Long, Long> data){
-        if (surfaceHolder != null){
-            long currentTime = currentTimeMillis();
+    protected void drawGraph(TreeMap<Long, Long> data, Canvas canvas){
+        long currentTime = currentTimeMillis();
 
-            Canvas graphCanvas = surfaceHolder.lockCanvas();
+        int graphWidth = canvas.getWidth() - SCALE_PADDING;
+        int graphHeight = canvas.getHeight();
 
-            int graphWidth = graphCanvas.getWidth() - SCALE_PADDING;
-            int graphHeight = graphCanvas.getHeight();
+        int graphDeciScale = (int) ceil(max(data.values()) / 10f) + 1;
 
-            int graphDeciScale = (int) ceil(max(data.values()) / 10f) + 1;
+        float unitPixelRatio = graphHeight / (float) (graphDeciScale * 10);
+        double timePixelRatio = graphWidth / 60000f;
 
-            float unitPixelRatio = graphHeight / (float) (graphDeciScale * 10);
-            double timePixelRatio = graphWidth / 60000f;
+        canvas.drawRGB(0xFF, 0xFF, 0xFF);
 
-            Paint scaleLinePaint = new Paint();
-            scaleLinePaint.setARGB(0xFF, 0x99, 0x99, 0x99);
-            scaleLinePaint.setStrokeWidth(3f);
+        for (int i = 2; i < graphDeciScale; i += 2){
+            canvas.drawLine(SCALE_PADDING, graphHeight - i * 10 * unitPixelRatio,
+                    SCALE_PADDING + graphWidth,
+                    graphHeight - i * 10 * unitPixelRatio, getScaleLinePaint());
+            canvas.drawText(Integer.toString(i * 10), 10,
+                    graphHeight - (i * 10 * unitPixelRatio - 25), getScalePaint());
+        }
 
-            Paint scalePaint = new Paint();
-            scalePaint.setARGB(0xFF, 0x55, 0x55, 0x55);
-            scalePaint.setTextSize(50f);
+        Map.Entry<Long, Long> entry, nextEntry;
+        for (entry = data.firstEntry(); (nextEntry = data.higherEntry(entry.getKey())) != null;
+                entry = nextEntry){
+            Paint toPaint = getLineNeutralPaint();
+            double slope = 1000 * (entry.getValue() - nextEntry.getValue()) /
+                    (float) (entry.getKey() - nextEntry.getKey());
 
-            Paint lineNeutralPaint = new Paint();
-            lineNeutralPaint.setARGB(0xFF, 0x77, 0x77, 0x77);
-            lineNeutralPaint.setStrokeWidth(5f);
-
-            Paint lineHighPaint = new Paint();
-            lineHighPaint.setColor(getResources().getColor(R.color.data_detail_high_value_bg));
-            lineHighPaint.setStrokeWidth(5f);
-
-            Paint lineLowPaint = new Paint();
-            lineLowPaint.setColor(getResources().getColor(R.color.data_detail_low_value_bg));
-            lineLowPaint.setStrokeWidth(5f);
-
-
-            graphCanvas.drawRGB(0xFF, 0xFF, 0xFF);
-
-            for (int i = 2; i < graphDeciScale; i += 2){
-                graphCanvas.drawLine(SCALE_PADDING, graphHeight - i * 10 * unitPixelRatio,
-                        SCALE_PADDING + graphWidth,
-                        graphHeight - i * 10 * unitPixelRatio, scalePaint);
-                graphCanvas.drawText(Integer.toString(i * 10), 10,
-                        graphHeight - (i * 10 * unitPixelRatio - 25), scalePaint);
+            if (slope > 3){
+                toPaint = getLineHighPaint();
+            } else if (slope < -3){
+                toPaint = getLineLowPaint();
             }
 
-            Map.Entry<Long, Long> entry, nextEntry;
+            float xPosInit = (float) (SCALE_PADDING +
+                    graphWidth - abs(currentTime - entry.getKey()) * timePixelRatio);
+            float yPosInit = graphHeight - entry.getValue() * unitPixelRatio;
+            float xPosLast =  (float) (SCALE_PADDING +
+                    graphWidth - abs(currentTime - nextEntry.getKey()) * timePixelRatio);
+            float yPosLast = graphHeight - nextEntry.getValue() * unitPixelRatio;
 
-            for (entry = data.firstEntry(); (nextEntry = data.higherEntry(entry.getKey())) != null;
-                    entry = nextEntry){
-                Paint toPaint = lineNeutralPaint;
-                double slope = 1000 * (entry.getValue() - nextEntry.getValue()) /
-                        (float) (entry.getKey() - nextEntry.getKey());
+            Path entryToNext = new Path();
+            entryToNext.moveTo(xPosInit, yPosInit);
+            entryToNext.lineTo(xPosLast, yPosLast);
+            entryToNext.lineTo(xPosLast, graphHeight);
+            entryToNext.lineTo(xPosInit, graphHeight);
+            entryToNext.lineTo(xPosInit, yPosInit);
+            entryToNext.setLastPoint(xPosInit, yPosInit);
+            entryToNext.setFillType(Path.FillType.WINDING);
 
-                if (slope > 3){
-                    toPaint = lineHighPaint;
-                } else if (slope < -3){
-                    toPaint = lineLowPaint;
-                }
-
-                float xPosInit = (float) (SCALE_PADDING +
-                        graphWidth - abs(currentTime - entry.getKey()) * timePixelRatio);
-                float yPosInit = graphHeight - entry.getValue() * unitPixelRatio;
-                float xPosLast =  (float) (SCALE_PADDING +
-                                graphWidth - abs(currentTime - nextEntry.getKey()) * timePixelRatio);
-                float yPosLast = graphHeight - nextEntry.getValue() * unitPixelRatio;
-
-                Path entryToNext = new Path();
-                entryToNext.moveTo(xPosInit, yPosInit);
-                entryToNext.lineTo(xPosLast, yPosLast);
-                entryToNext.lineTo(xPosLast, graphHeight);
-                entryToNext.lineTo(xPosInit, graphHeight);
-                entryToNext.lineTo(xPosInit, yPosInit);
-                entryToNext.setLastPoint(xPosInit, yPosInit);
-                entryToNext.setFillType(Path.FillType.WINDING);
-
-                graphCanvas.drawPath(entryToNext, toPaint);
-            }
-
-            surfaceHolder.unlockCanvasAndPost(graphCanvas);
-
+            canvas.drawPath(entryToNext, toPaint);
         }
     }
 
-    private static TreeMap<Long, Long> stringToLong(TreeMap<Long, String> toConvert){
-        TreeMap<Long, Long> newMap = new TreeMap<Long, Long>();
-        for (TreeMap.Entry<Long, String> dataPair : toConvert.entrySet()){
-            newMap.put(dataPair.getKey(), Long.valueOf(dataPair.getValue()));
-        }
-        return newMap;
-    }
 }

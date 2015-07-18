@@ -3,6 +3,7 @@ package lab.star.surf_iot2015.sensor;
 import android.content.Context;
 import android.util.JsonReader;
 import android.util.JsonWriter;
+import android.util.Log;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -33,19 +34,21 @@ public class DataGraph {
     public DataGraph (String name, Context context) throws GraphFileParseError {
 
         this.context = context;
-        this.dataGraphName = name;
+        dataGraphName = name;
 
         ArrayList<Long> timestamps = new ArrayList<Long>();
         ArrayList<String> dataPoints = new ArrayList<String>();
 
         try {
-            FileInputStream dataGraphJSON = context.openFileInput(name);
+            FileInputStream dataGraphJSON = context.openFileInput(dataGraphName);
             parseDataGraphJSON(dataGraphJSON, timestamps, dataPoints);
             dataGraphJSON.close();
         } catch (FileNotFoundException fileNotFoundEx){
         } catch (IOException ioEx){
-        } catch (GraphFileParseError parseEx) {
+        } catch (GraphFileParseError ioEx){
         }
+
+        context.deleteFile(dataGraphName);
 
         populateData(timestamps, dataPoints);
 
@@ -89,10 +92,9 @@ public class DataGraph {
         throws IOException, GraphFileParseError {
 
         JsonReader reader = new JsonReader(new InputStreamReader(in, "UTF-8"));
-
         reader.beginObject();
 
-        if (reader.nextName() != TIMESTAMP){
+        if (!reader.nextName().equals(TIMESTAMP)){
             throw new GraphFileStructureError();
         }
 
@@ -108,7 +110,7 @@ public class DataGraph {
 
         reader.endArray();
 
-        if (reader.nextName() != DATA_POINTS){
+        if (!reader.nextName().equals(DATA_POINTS)){
             throw new GraphFileStructureError();
         }
 

@@ -74,5 +74,13 @@
 
     </LinearLayout>
 
+    <Button android:id="@+id/dialog_check_band_close_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:background="#DDDDDD"
+
+        android:textColor="#555555"
+        android:text="OK"/>
 
 </LinearLayout>

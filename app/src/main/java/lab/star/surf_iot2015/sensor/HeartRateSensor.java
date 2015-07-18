@@ -16,7 +16,7 @@ import static java.lang.System.currentTimeMillis;
 
 public class HeartRateSensor extends Sensor {
 
-    private static final String SENSOR_NAME = "HeartRate";
+    private static final String SENSOR_NAME = HEART_RATE_SENSOR;
 
     private BandHeartRateEventListener eventListener;
 
@@ -59,11 +59,12 @@ public class HeartRateSensor extends Sensor {
     }
 
     protected void disableResolution (){
-
-        try {
-            client.getSensorManager().unregisterHeartRateEventListener(eventListener);
-        } catch (BandIOException bandIOex){
-        } catch (BandException bandEx){
+        if (eventListener != null) {
+            try {
+                client.getSensorManager().unregisterHeartRateEventListener(eventListener);
+            } catch (BandIOException bandIOex) {
+            } catch (BandException bandEx) {
+            }
         }
 
     }
