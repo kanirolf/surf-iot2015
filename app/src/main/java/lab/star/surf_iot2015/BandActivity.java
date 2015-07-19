@@ -11,6 +11,7 @@ import android.util.Log;
 import lab.star.surf_iot2015.dialogs.CheckBandPairedDialog;
 import lab.star.surf_iot2015.service_user.DataReaderUser;
 import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
+import lab.star.surf_iot2015.service_user.ReminderManagerUser;
 import lab.star.surf_iot2015.service_user.SensorTogglerUser;
 
 abstract public class BandActivity extends Activity implements BandConnectCallback {
@@ -18,6 +19,7 @@ abstract public class BandActivity extends Activity implements BandConnectCallba
     private ServiceConnection dataReaderConnection;
     private ServiceConnection listenerRegistererConnection;
     private ServiceConnection sensorTogglerConnection;
+    private ServiceConnection reminderManagerConnection;
 
     private BandConnector bandConnector;
 
@@ -33,9 +35,19 @@ abstract public class BandActivity extends Activity implements BandConnectCallba
         if (dataReaderConnection != null){
             unbindService(dataReaderConnection);
         }
+
         if (listenerRegistererConnection != null){
             unbindService(listenerRegistererConnection);
         }
+
+        if (sensorTogglerConnection != null){
+            unbindService(sensorTogglerConnection);
+        }
+        
+        if (reminderManagerConnection != null){
+            unbindService(reminderManagerConnection);
+        }
+
     }
 
     @Override
@@ -104,6 +116,12 @@ abstract public class BandActivity extends Activity implements BandConnectCallba
                 BIND_WAIVE_PRIORITY);
     }
 
+    protected void getReminderManager(ReminderManagerUser reminderManagerUser){
+        reminderManagerConnection = reminderManagerInstance(reminderManagerUser);
+        Intent reminderManagerIntent = new Intent(this, STARAppService.class)
+                .setAction(STARAppService.GET_REMINDER_MANAGER);
+        bindService(reminderManagerIntent, reminderManagerConnection, BIND_WAIVE_PRIORITY);
+    }
 
     private ServiceConnection bandConnectorConnection = new ServiceConnection() {
         @Override
@@ -171,6 +189,21 @@ abstract public class BandActivity extends Activity implements BandConnectCallba
                             .acquireHeartRateConsent(delegate);
                 } catch (RemoteException remoteEx){
                 }
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName componentName) {
+            }
+        };
+    }
+
+    private static ServiceConnection reminderManagerInstance
+            (final ReminderManagerUser reminderManagerUser) {
+        return new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+                reminderManagerUser.onAcquireReminderManager(
+                        ReminderManager.Stub.asInterface(iBinder));
             }
 
             @Override
