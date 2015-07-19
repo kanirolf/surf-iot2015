@@ -2,6 +2,7 @@ package lab.star.surf_iot2015;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
@@ -10,12 +11,15 @@ import com.microsoft.band.BandClientManager;
 import com.microsoft.band.BandException;
 import com.microsoft.band.BandInfo;
 import com.microsoft.band.ConnectionState;
-import com.microsoft.band.sensors.HeartRateConsentListener;
+import com.microsoft.band.tiles.BandIcon;
+import com.microsoft.band.tiles.BandTile;
+
+import java.util.UUID;
 
 import lab.star.surf_iot2015.dialogs.CheckBandPairedDialog;
 
 
-public class HeartRateConsentActivity extends Activity implements HeartRateConsentListener {
+public class TileCreateActivity extends Activity {
 
     private BandClient client = null;
 
@@ -34,19 +38,6 @@ public class HeartRateConsentActivity extends Activity implements HeartRateConse
         }
     }
 
-
-    @Override
-    public void userAccepted(boolean userAccepted){
-        Intent heartRateConsentReceived = new Intent(this, STARAppService.class);
-        if (userAccepted){
-            heartRateConsentReceived.setAction(STARAppService.HEART_RATE_CONSENT_YES);
-        } else {
-            heartRateConsentReceived.setAction(STARAppService.HEART_RATE_CONSENT_NO);
-        }
-        startService(heartRateConsentReceived);
-        finish();
-    }
-
     private class connectToBand extends AsyncTask<Void, Void, Void> {
 
         @Override
@@ -55,12 +46,28 @@ public class HeartRateConsentActivity extends Activity implements HeartRateConse
             if (pairedBands.length == 0){
                 showNotPaired();
             } else {
-                client = BandClientManager.getInstance().create(
-                        HeartRateConsentActivity.this, pairedBands[0]);
+                client = BandClientManager.getInstance().create(TileCreateActivity.this,
+                        pairedBands[0]);
                 try {
                     if (client.connect().await() == ConnectionState.CONNECTED){
-                        client.getSensorManager().requestHeartRateConsent(
-                                HeartRateConsentActivity.this, HeartRateConsentActivity.this);
+                        UUID bandUUID = UUID.randomUUID();
+
+                        BandIcon smallIcon = BandIcon.toBandIcon(BitmapFactory.decodeResource(
+                                TileCreateActivity.this.getResources(), R.drawable.band_small_icon));
+                        BandIcon largeIcon = BandIcon.toBandIcon(BitmapFactory.decodeResource(
+                                TileCreateActivity.this.getResources(), R.drawable.band_large_icon));
+
+                        BandTile STARTile = new BandTile.Builder(bandUUID, "STARHealth", largeIcon)
+                                .setTileSmallIcon(smallIcon)
+                                .build();
+
+                        if (client.getTileManager()
+                                .addTile(TileCreateActivity.this, STARTile)
+                                .await()){
+                            startService(new Intent(TileCreateActivity.this, STARAppService.class)
+                                    .setAction(STARAppService.TILE_CREATED)
+                                    .putExtra(STARAppService.TILE_UUID_SPECIFIER, bandUUID));
+                        }
                     }
                 } catch (InterruptedException interruptedEx){
                 } catch (BandException bandEx){

@@ -1,6 +1,7 @@
 package lab.star.surf_iot2015.reminder;
 
 import android.content.Context;
+import android.graphics.Paint;
 import android.os.IBinder;
 import android.os.RemoteException;
 import android.util.JsonReader;
@@ -17,6 +18,7 @@ import java.util.ArrayDeque;
 import java.util.Collection;
 import java.util.TreeSet;
 
+import lab.star.surf_iot2015.STARAppService;
 import lab.star.surf_iot2015.SensorDataReader;
 import lab.star.surf_iot2015.SensorListenerRegister;
 import lab.star.surf_iot2015.SensorServiceCallback;
@@ -43,6 +45,7 @@ public class Reminder {
 
     private Collection<Trigger> triggers = null;
 
+    private STARAppService serviceInstance;
     private SensorDataReader dataReader;
     private SensorListenerRegister listenerRegister;
 
@@ -129,10 +132,12 @@ public class Reminder {
 
     }
 
-    public void registerReminder(SensorListenerRegister listenerRegister, SensorDataReader dataReader){
+    public void registerReminder(STARAppService serviceInstance,
+                                 SensorListenerRegister listenerRegister, SensorDataReader dataReader){
         for (Trigger trigger : triggers){
             trigger.registerTrigger(listenerRegister, dataReader);
         }
+        this.serviceInstance = serviceInstance;
         this.listenerRegister = listenerRegister;
         this.dataReader = dataReader;
     }
@@ -175,7 +180,9 @@ public class Reminder {
             return;
         }
 
-        Log.d(String.format("Reminder (%s):", name), reminderText);
+        if (serviceInstance != null) {
+            serviceInstance.messageToTile(name, reminderText);
+        }
     }
 
     public static class Trigger implements SensorServiceCallback {

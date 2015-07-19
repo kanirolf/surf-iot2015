@@ -4,21 +4,37 @@ import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Paint;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.os.RemoteException;
 
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandClientManager;
+import com.microsoft.band.BandException;
+import com.microsoft.band.BandIOException;
 import com.microsoft.band.BandInfo;
 import com.microsoft.band.ConnectionState;
 import com.microsoft.band.UserConsent;
+import com.microsoft.band.notifications.MessageFlags;
 import com.microsoft.band.sensors.SampleRate;
+import com.microsoft.band.tiles.BandIcon;
+import com.microsoft.band.tiles.BandTile;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.NavigableMap;
+import java.util.UUID;
 
+import lab.star.surf_iot2015.reminder.Reminder;
 import lab.star.surf_iot2015.sensor.HeartRateSensor;
 import lab.star.surf_iot2015.sensor.PedometerSensor;
 import lab.star.surf_iot2015.sensor.Sensor;
@@ -35,6 +51,8 @@ public class STARAppService extends Service {
     // use this constant with Intent.putString() to specify which sensor the intent will control
     public static final String SENSOR_SPECIFIER = "SensorSpecifier";
 
+    public static final String TILE_UUID_SPECIFIER = "TileUUIDSpecifier";
+
     // ACTION constants to use with Intent.setAction() with an Intent sent to startService();
     // each does the specified action
     public static final String ENABLE_SENSOR = "lab.star.surf_iot2015.EnableSensor";
@@ -42,6 +60,8 @@ public class STARAppService extends Service {
 
     public static final String HEART_RATE_CONSENT_YES = "lab.star.surf_iot2015.HeartRateConsentYes";
     public static final String HEART_RATE_CONSENT_NO = "lab.star.surf_iot2015.HeartRateConsentNo";
+
+    public static final String TILE_CREATED = "lab.star.surf_iot2015.TileCreated";
 
     // ACTION constants to use with Intent.setAction() with an Intent sent to bindService();
     // each returns an Interface as specified in onBind()
@@ -78,6 +98,9 @@ public class STARAppService extends Service {
     private HashMap<String, Sensor> sensors = new HashMap<String, Sensor>();
 
     private ArrayDeque<HeartRateConsentDelegate> heartRateConsentDelegates = null;
+
+    private ArrayList<Reminder> reminders  = null;
+    private UUID bandUUID = null;
 
     // When created, foreground this service, i.e. create a persistent notification that stays
     // until the service is terminated or the service is backgrounded; see
@@ -128,6 +151,9 @@ public class STARAppService extends Service {
                         } catch (RemoteException remoteEx) {
                         }
                     }
+                    break;
+                case TILE_CREATED:
+                    bandUUID = (UUID) intent.getSerializableExtra(TILE_UUID_SPECIFIER);
                     break;
             }
         }
@@ -183,6 +209,22 @@ public class STARAppService extends Service {
         }
     }
 
+    public void messageToTile (final String title, final String message){
+        if (bandUUID != null) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        client.getNotificationManager().sendMessage(bandUUID, title, message,
+                                new Date(), MessageFlags.SHOW_DIALOG).await();
+                    } catch (BandException bandEx){
+                    } catch (InterruptedException interruptEx){
+                    }
+                }
+            }).start();
+        }
+    }
+
     // Helper function that functions a like a factory function. Use this to access Sensors instead
     // of explicitly accessing the Map that contains them; the function will ensure that:
     //
@@ -225,6 +267,28 @@ public class STARAppService extends Service {
 
     }
 
+    private class createTileOnBand extends AsyncTask<Void, Void, Void>{
+        @Override
+        public Void doInBackground(Void... params){
+            if (bandUUID == null) {
+                try {
+                    Collection<BandTile> tiles = client.getTileManager().getTiles().await();
+                    if (tiles.isEmpty()) {
+                        if (client.getTileManager().getRemainingTileCapacity().await() > 0) {
+                            STARAppService.this.startActivity(
+                                    new Intent(STARAppService.this, TileCreateActivity.class)
+                            );
+                        }
+                    }
+
+                } catch (BandException bandEx){
+                } catch (InterruptedException interruptEx){
+                }
+            }
+            return null;
+        }
+
+    }
     // ---------------------------------------------------------------------------------------------
     //  Methods for SensorBandConnector
     // ---------------------------------------------------------------------------------------------
@@ -283,6 +347,7 @@ public class STARAppService extends Service {
                     // the Service isn't responsible for prompting the user to take
                     // action to successfully connect; this is the job of UI elements, not
                     // background elements like the Service,
+                    new createTileOnBand().execute();
                     callback.onBandConnectFailure();
 
                 } else {
@@ -394,5 +459,23 @@ public class STARAppService extends Service {
             }
         };
 
+    private final ReminderManager.Stub reminderManagerInstance =
+            new ReminderManager.Stub() {
+                @Override
+                public List<String> getReminders() throws RemoteException {
+                    return (List<String>) reminders.clone();
+                }
+
+                @Override
+                public void setReminder(String reminderName, ReminderManagerRegisterer registerer)
+                        throws RemoteException {
+                    try {
+                        reminders.add(Reminder.fromJSON(STARAppService.this, reminderName));
+                    } catch (IOException ioEx){
+                        registerer.onReminderRegisterFailure();
+                    }
+                    registerer.onReminderRegisterSuccess();
+                }
+            };
 
 }
