@@ -15,7 +15,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.TreeSet;
 
 import lab.star.surf_iot2015.STARAppService;
@@ -142,9 +144,17 @@ public class Reminder {
         this.dataReader = dataReader;
     }
 
+    public String getName(){
+        return name;
+    }
+
     public Reminder setName(String name){
         this.name = name;
         return this;
+    }
+
+    public String getReminderText(){
+        return reminderText;
     }
 
     public Reminder setReminderText(String reminderText){
@@ -155,6 +165,20 @@ public class Reminder {
     public Reminder removeReminderText(){
         this.reminderText = "";
         return this;
+    }
+
+    public Long[] getActiveTime(){
+        return new Long[]{activeTimeStart, activeTimeEnd};
+    }
+
+    public Reminder setActiveTime(long timeStart, long timeEnd){
+        activeTimeStart = timeStart;
+        activeTimeEnd = timeEnd;
+        return this;
+    }
+
+    public List<Trigger> getTriggers(){
+        return new ArrayList<Trigger>(triggers);
     }
 
     public Reminder addTrigger(Trigger trigger){
