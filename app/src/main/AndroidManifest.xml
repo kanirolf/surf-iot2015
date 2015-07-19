@@ -26,39 +26,55 @@
         <!-- actual activities -->
         <activity
             android:name=".MainDataConsoleActivity"
-            android:label="@string/app_name"
-            android:theme="@android:style/Theme.Holo.NoActionBar" >
+            android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity
             android:name=".DataDetailsActivity"
             android:label="@string/title_activity_data_details"
-            android:parentActivityName=".MainDataConsoleActivity"
-            android:theme="@android:style/Theme.Holo.NoActionBar" >
+            android:parentActivityName=".MainDataConsoleActivity" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="lab.star.surf_iot2015.MainDataConsoleActivity" />
         </activity>
 
         <activity
-            android:name=".HeartRateConsentActivity"
-            android:label="@string/title_activity_heart_rate_consent"
-            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"
-            android:excludeFromRecents="true"
-            android:noHistory="true">
-
+            android:name=".ReminderActivity"
+            android:label="@string/title_activity_reminder" >
         </activity>
 
+        <activity
+            android:name=".ReminderCreateActivity"
+            android:label="@string/title_activity_reminder_create" >
+        </activity>
+
+        <activity
+            android:name=".HeartRateConsentActivity"
+            android:excludeFromRecents="true"
+            android:label="@string/title_activity_heart_rate_consent"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar" >
+        </activity>
+
+        <activity
+            android:name=".TileCreateActivity"
+            android:excludeFromRecents="true"
+            android:label="@string/title_activity_tile_create"
+            android:noHistory="true"
+            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar" >
+        </activity>
 
         <service
             android:name=".STARAppService"
             android:enabled="true"
             android:exported="true" >
         </service>
+
 
     </application>
 

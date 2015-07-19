@@ -476,6 +476,7 @@ public class STARAppService extends Service {
                     }
                     registerer.onReminderRegisterSuccess();
                 }
+
             };
 
 }

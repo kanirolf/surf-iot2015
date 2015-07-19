@@ -48,4 +48,7 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="title_activity_heart_rate_consent">HeartRateConsentActivity</string>
+    <string name="title_activity_reminder">ReminderActivity</string>
+    <string name="title_activity_reminder_create">ReminderCreateActivity</string>
+    <string name="title_activity_tile_create">TileCreateActivity</string>
 </resources>
