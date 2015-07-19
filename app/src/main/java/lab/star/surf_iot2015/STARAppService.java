@@ -70,6 +70,7 @@ public class STARAppService extends Service {
     public static final String GET_DATA_READER = "lab.star.surf_iot2015.GetDataReader";
     public static final String GET_SENSOR_TOGGLER = "lab.star.surf_iot2015.GetSensorToggler";
     public static final String GET_HEART_RATE_CONSENT = "lab.star.surf_iot2015.GetHeartRateConsent";
+    public static final String GET_REMINDER_MANAGER = "lab.star.surf_iot2015.GetReminderManager";
 
     // ACTION constant to use with Intent.setAction(). The service will stop when this is sent
     // through startService()
@@ -195,6 +196,9 @@ public class STARAppService extends Service {
 
             case GET_HEART_RATE_CONSENT:
                 return heartRateConsentInstance;
+
+            case GET_REMINDER_MANAGER:
+                return reminderManagerInstance;
         }
 
         return null;
