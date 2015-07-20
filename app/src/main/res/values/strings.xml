@@ -47,8 +47,31 @@
     <string name="title_activity_data_details">DataDetailsActivity</string>
 
     <string name="hello_world">Hello world!</string>
-    <string name="title_activity_heart_rate_consent">HeartRateConsentActivity</string>
-    <string name="title_activity_reminder">ReminderActivity</string>
-    <string name="title_activity_reminder_create">ReminderCreateActivity</string>
-    <string name="title_activity_tile_create">TileCreateActivity</string>
+    <string name="title_activity_heart_rate_consent"></string>
+    <string name="title_activity_reminder">Reminders</string>
+    <string name="title_activity_reminder_create">New Reminder</string>
+    <string name="title_activity_tile_create"></string>
+
+    <string-array name="reminder_active_options">
+        <item>always</item>
+    </string-array>
+
+    <string-array name="sensor_types">
+        <item>AccelSensor</item>
+        <item>GyroSensor</item>
+        <item>DistanceSensor</item>
+        <item>HeartRateSensor</item>
+        <item>PedometerSensor</item>
+        <item>SkinTempSensor</item>
+        <item>SkinContactSensor</item>
+        <item>UVSensor</item>
+        <item>CalorieSensor</item>
+    </string-array>
+
+    <string-array name="trigger_types">
+        <item>above</item>
+        <item>below</item>
+        <item>rising</item>
+        <item>falling</item>
+    </string-array>
 </resources>

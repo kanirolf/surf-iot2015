@@ -110,6 +110,7 @@ public abstract class Sensor {
         try {
             data.closeDataGraph();
         } catch (DataGraph.GraphFileWriteError writeError){
+            Log.d("Sensor", "data not written!");
         }
     }
 

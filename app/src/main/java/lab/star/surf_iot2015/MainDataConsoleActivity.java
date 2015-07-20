@@ -3,6 +3,7 @@ package lab.star.surf_iot2015;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,6 +34,8 @@ public class MainDataConsoleActivity extends BandActivity
 
     private boolean heartRateConsent = false;
 
+    private MenuFragment menuFragment = null;
+
 
     // gets the Views responsible for displaying Skin Contact (i.e. the Views at the top of the
     // screen that say "band is on" or "band is off" and starts STARAppService
@@ -45,6 +48,30 @@ public class MainDataConsoleActivity extends BandActivity
         bandIsOnImage = (ImageView) findViewById(R.id.bandIsOnImage);
         bandIsOnSpacer = (Space) findViewById(R.id.bandIsOnSpacer);
         bandIsOnStatus = (TextView) findViewById(R.id.bandIsOnStatus);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Log.d("MainData", "listener called!");
+                if (menuFragment == null) {
+                    Log.d("MainData", "menu added!");
+                    menuFragment = new MenuFragment();
+                    getFragmentManager().beginTransaction()
+                            .add(R.id.content, menuFragment)
+                            .commit();
+                } else {
+                    Log.d("MainData", "menu removed!");
+                    getFragmentManager().beginTransaction()
+                            .remove(menuFragment)
+                            .commit();
+                    menuFragment = null;
+                }
+            }
+        });
+        toolbar.setNavigationIcon(R.drawable.menu);
 
         initializeService();
 
@@ -62,13 +89,6 @@ public class MainDataConsoleActivity extends BandActivity
     // be Fragments to simplify things)
     @Override
     public void onBandConnectSuccess(){
-        runOnUiThread(new Runnable() {
-            @Override
-            public void run() {
-                // set the overlay that greys the Console out to not be drawn
-                findViewById(R.id.dataConsoleInactiveOverlay).setVisibility(View.GONE);
-            }
-        });
         getHeartRateConsent(this);
         getDataReader(this);
     }
@@ -140,9 +160,9 @@ public class MainDataConsoleActivity extends BandActivity
 
                 // resize elements to fit "ON"
                 bandIsOnStatus.setLayoutParams(new LayoutParams(0,
-                        ViewGroup.LayoutParams.MATCH_PARENT, 4.5f));
+                        ViewGroup.LayoutParams.MATCH_PARENT, 6f));
                 bandIsOnSpacer.setLayoutParams(new LayoutParams(0,
-                        ViewGroup.LayoutParams.MATCH_PARENT, 10.5f));
+                        ViewGroup.LayoutParams.MATCH_PARENT, 9f));
 
                 // image of band should be visible when band is on
                 bandIsOnImage.setVisibility(View.VISIBLE);
@@ -162,9 +182,9 @@ public class MainDataConsoleActivity extends BandActivity
 
                 // resize elements to fit "OFF"
                 bandIsOnStatus.setLayoutParams(new LinearLayout.LayoutParams(0,
-                        ViewGroup.LayoutParams.MATCH_PARENT, 5.5f));
+                        ViewGroup.LayoutParams.MATCH_PARENT, 6f));
                 bandIsOnSpacer.setLayoutParams(new LinearLayout.LayoutParams(0,
-                        ViewGroup.LayoutParams.MATCH_PARENT, 9.5f));
+                        ViewGroup.LayoutParams.MATCH_PARENT, 9f));
 
                 // image of band should not be visible when band is off
                 bandIsOnImage.setVisibility(View.INVISIBLE);

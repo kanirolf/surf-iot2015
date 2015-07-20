@@ -2,9 +2,11 @@ package lab.star.surf_iot2015;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandClientManager;
@@ -52,10 +54,21 @@ public class TileCreateActivity extends Activity {
                     if (client.connect().await() == ConnectionState.CONNECTED){
                         UUID bandUUID = UUID.randomUUID();
 
-                        BandIcon smallIcon = BandIcon.toBandIcon(BitmapFactory.decodeResource(
-                                TileCreateActivity.this.getResources(), R.drawable.band_small_icon));
-                        BandIcon largeIcon = BandIcon.toBandIcon(BitmapFactory.decodeResource(
-                                TileCreateActivity.this.getResources(), R.drawable.band_large_icon));
+                        BandIcon smallIcon = BandIcon.toBandIcon(
+                                Bitmap.createScaledBitmap(
+                                        BitmapFactory.decodeResource(
+                                            TileCreateActivity.this.getResources(),
+                                            R.drawable.band_small_icon),
+                                        24, 24, false)
+                        );
+
+                        BandIcon largeIcon = BandIcon.toBandIcon(
+                                Bitmap.createScaledBitmap(
+                                        BitmapFactory.decodeResource(
+                                            TileCreateActivity.this.getResources(),
+                                            R.drawable.band_large_icon),
+                                        46, 46, false)
+                        );
 
                         BandTile STARTile = new BandTile.Builder(bandUUID, "STARHealth", largeIcon)
                                 .setTileSmallIcon(smallIcon)
@@ -68,9 +81,11 @@ public class TileCreateActivity extends Activity {
                                     .setAction(STARAppService.TILE_CREATED)
                                     .putExtra(STARAppService.TILE_UUID_SPECIFIER, bandUUID));
                         }
+                        finish();
                     }
                 } catch (InterruptedException interruptedEx){
                 } catch (BandException bandEx){
+                    Log.d("TileCreateActivity", "failureeee", bandEx);
                 }
 
             }

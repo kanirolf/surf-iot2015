@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import lab.star.surf_iot2015.dialogs.CheckBandPairedDialog;
@@ -14,7 +15,7 @@ import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
 import lab.star.surf_iot2015.service_user.ReminderManagerUser;
 import lab.star.surf_iot2015.service_user.SensorTogglerUser;
 
-abstract public class BandActivity extends Activity implements BandConnectCallback {
+abstract public class BandActivity extends AppCompatActivity implements BandConnectCallback {
 
     private ServiceConnection dataReaderConnection;
     private ServiceConnection listenerRegistererConnection;
@@ -44,9 +45,9 @@ abstract public class BandActivity extends Activity implements BandConnectCallba
             unbindService(sensorTogglerConnection);
         }
         
-        if (reminderManagerConnection != null){
-            unbindService(reminderManagerConnection);
-        }
+//        if (reminderManagerConnection != null){
+//            unbindService(reminderManagerConnection);
+//        }
 
     }
 

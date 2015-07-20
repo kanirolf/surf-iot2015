@@ -53,11 +53,6 @@ public class STARAppService extends Service {
 
     public static final String TILE_UUID_SPECIFIER = "TileUUIDSpecifier";
 
-    // ACTION constants to use with Intent.setAction() with an Intent sent to startService();
-    // each does the specified action
-    public static final String ENABLE_SENSOR = "lab.star.surf_iot2015.EnableSensor";
-    public static final String DISABLE_SENSOR = "lab.star.surf_iot2015.DisableSensor";
-
     public static final String HEART_RATE_CONSENT_YES = "lab.star.surf_iot2015.HeartRateConsentYes";
     public static final String HEART_RATE_CONSENT_NO = "lab.star.surf_iot2015.HeartRateConsentNo";
 
@@ -100,7 +95,7 @@ public class STARAppService extends Service {
 
     private ArrayDeque<HeartRateConsentDelegate> heartRateConsentDelegates = null;
 
-    private ArrayList<Reminder> reminders  = null;
+    private ArrayList<Reminder> reminders  = new ArrayList<Reminder>();
     private UUID bandUUID = null;
 
     // When created, foreground this service, i.e. create a persistent notification that stays
@@ -276,13 +271,16 @@ public class STARAppService extends Service {
         public Void doInBackground(Void... params){
             if (bandUUID == null) {
                 try {
-                    Collection<BandTile> tiles = client.getTileManager().getTiles().await();
+                    List<BandTile> tiles = client.getTileManager().getTiles().await();
                     if (tiles.isEmpty()) {
                         if (client.getTileManager().getRemainingTileCapacity().await() > 0) {
                             STARAppService.this.startActivity(
                                     new Intent(STARAppService.this, TileCreateActivity.class)
+                                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                             );
                         }
+                    } else {
+                        bandUUID =  tiles.get(0).getTileId();
                     }
 
                 } catch (BandException bandEx){
@@ -467,19 +465,34 @@ public class STARAppService extends Service {
             new ReminderManager.Stub() {
                 @Override
                 public List<String> getReminders() throws RemoteException {
-                    return (List<String>) reminders.clone();
+
+                    ArrayList<String> reminderFileNames = new ArrayList<>();
+                    for (Reminder reminder : reminders){
+                        reminderFileNames.add(reminder.getName());
+                    }
+                    return reminderFileNames;
                 }
 
                 @Override
                 public void setReminder(String reminderName, ReminderManagerRegisterer registerer)
                         throws RemoteException {
+
+
                     try {
+                        Reminder newReminder = Reminder.fromJSON(STARAppService.this, reminderName);
                         reminders.add(Reminder.fromJSON(STARAppService.this, reminderName));
+                        newReminder.registerReminder(STARAppService.this,
+                                sensorListenerRegisterInstance, sensorDataReaderInstance);
                     } catch (IOException ioEx){
                         registerer.onReminderRegisterFailure();
                     }
+
+                    if (bandUUID == null){
+                        new createTileOnBand().execute();
+                    }
                     registerer.onReminderRegisterSuccess();
                 }
+
 
             };
 

@@ -1,61 +1,88 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="10dp"
-    android:paddingRight="10dp"
-    android:paddingTop="10dp"
+
 
     android:orientation="vertical"
 
     tools:context="lab.star.surf_iot2015.ReminderActivity"
     android:background="#77df77">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
 
-        android:orientation="horizontal"
-        android:weightSum="30"
-        android:id="@+id/addReminderButton">
+    <android.support.v7.widget.Toolbar
+
+        android:id="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:minHeight="?android:attr/actionBarSize"
+        android:background="@color/background_material_dark"
+
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/content">
 
         <LinearLayout
-            android:layout_width="0dp"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
 
-            android:background="#999999"
 
-            android:orientation="horizontal"
-            android:gravity="center_horizontal"
-            android:layout_weight="4">
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="match_parent"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
+            >
 
-                android:scaleType="fitCenter"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
 
-                android:src="@drawable/add_bell"/>
+                android:orientation="horizontal"
+                android:weightSum="30"
+                android:id="@+id/newReminderButton">
 
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+
+                    android:background="#999999"
+
+                    android:orientation="horizontal"
+                    android:gravity="center_horizontal"
+                    android:layout_weight="4">
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+
+                        android:scaleType="fitCenter"
+
+                        android:src="@drawable/add_bell"/>
+
+                </LinearLayout>
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+
+                    android:gravity="center"
+                    android:textSize="24dp"
+                    android:fontFamily="sans-serif-light"
+                    android:textColor="#999999"
+                    android:text="add reminder"
+                    android:background="#ececec"
+                    android:layout_weight="26" />
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+
+            <ListView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/reminderList" />
         </LinearLayout>
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-
-            android:gravity="center"
-            android:textSize="24dp"
-            android:fontFamily="sans-serif-light"
-            android:textColor="#999999"
-            android:text="add reminder"
-            android:background="#ececec"
-            android:layout_weight="26" />
-    </LinearLayout>
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="10dp" />
-
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/reminderList" />
+    </RelativeLayout>
 
 </LinearLayout>

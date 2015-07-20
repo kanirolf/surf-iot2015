@@ -37,7 +37,7 @@
         <activity
             android:name=".DataDetailsActivity"
             android:label="@string/title_activity_data_details"
-            android:parentActivityName=".MainDataConsoleActivity" >
+            android:parentActivityName=".MainDataConsoleActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="lab.star.surf_iot2015.MainDataConsoleActivity" />
@@ -50,7 +50,11 @@
 
         <activity
             android:name=".ReminderCreateActivity"
-            android:label="@string/title_activity_reminder_create" >
+            android:label="@string/title_activity_reminder_create"
+            android:windowSoftInputMode="adjustPan|adjustResize" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="lab.star.surf_iot2015.ReminderActivity" />
         </activity>
 
         <activity

@@ -1,9 +1,9 @@
 package lab.star.surf_iot2015.reminder;
 
 import android.content.Context;
-import android.graphics.Paint;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.annotation.NonNull;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 import android.util.Log;
@@ -17,6 +17,8 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -45,7 +47,8 @@ public class Reminder {
     private long activeTimeStart = -1;
     private long activeTimeEnd = -1;
 
-    private Collection<Trigger> triggers = null;
+    private HashSet<String> sensors = new HashSet<String>();
+    private Collection<Trigger> triggers = new ArrayDeque<Trigger>();
 
     private STARAppService serviceInstance;
     private SensorDataReader dataReader;
@@ -86,7 +89,7 @@ public class Reminder {
                     newReminder.triggers = new ArrayDeque<Trigger>();
                     reminderReader.beginArray();
                     while(reminderReader.hasNext()){
-                        newReminder.triggers.add(Trigger.parseTrigger(newReminder, reminderReader));
+                        newReminder.addTrigger(Trigger.parseTrigger(newReminder, reminderReader));
                     }
                     reminderReader.endArray();
                     break;
@@ -97,6 +100,10 @@ public class Reminder {
 
         reminderReader.close();
         reminderFile.close();
+
+        for (Trigger trigger : newReminder.triggers){
+            newReminder.sensors.add(trigger.getSensorType());
+        }
 
         return newReminder;
     }
@@ -182,17 +189,29 @@ public class Reminder {
     }
 
     public Reminder addTrigger(Trigger trigger){
+        trigger.attachToReminder(this);
         triggers.add(trigger);
         if (listenerRegister != null && dataReader != null) {
             trigger.registerTrigger(listenerRegister, dataReader);
         }
+        sensors.add(trigger.getSensorType());
         return this;
     }
 
     public Reminder removeTrigger(Trigger trigger){
         triggers.remove(trigger);
         trigger.unregisterTrigger();
+
+        sensors = new HashSet<String>();
+        for (Trigger existingTrigger : triggers){
+            sensors.add(existingTrigger.getSensorType());
+        }
+
         return this;
+    }
+
+    public HashSet<String> getSensors(){
+        return sensors;
     }
 
     private void onTriggerValueChange(){
@@ -231,51 +250,52 @@ public class Reminder {
 
         private boolean isTriggered = false;
 
-        private Reminder reminder;
+        private Reminder reminder = null;
 
         private SensorListenerRegister listenerRegister;
         private SensorDataReader dataReader;
 
-        public Trigger (Reminder reminder, String sensorType, int thresholdType, double threshold, long duration){
-            this.reminder = reminder;
+        public Trigger (String sensorType, int thresholdType, double threshold, long duration){
 
-            this.sensorType = sensorType;
-            this.thresholdType = thresholdType;
+            this.setSensorType(sensorType);
+            this.setThresholdType(thresholdType);
 
-            this.threshold = threshold;
-            this.duration = duration;
+            this.setThreshold(threshold);
+            this.setDuration(duration);
         }
 
         @Override
         public void valueChanged(String newValue){
             boolean triggerValue = false;
 
-            switch (thresholdType){
+            Log.d(reminder.getName(), "trigger called!");
+            switch (getThresholdType()){
                 case THRESHOLD_ABOVE:
-                    triggerValue = Double.valueOf(newValue) > threshold;
+                    triggerValue = Double.valueOf(newValue) > getThreshold();
                     break;
                 case THRESHOLD_BELOW:
-                    triggerValue = Double.valueOf(newValue) < threshold;
+                    triggerValue = Double.valueOf(newValue) < getThreshold();
                     break;
                 case THRESHOLD_RISING:
                 case THRESHOLD_FALLING:
                     TreeSet<Long> data = null;
                     try {
-                        for(String dataPoint : (Collection<String>) dataReader.findEntriesUpTo(sensorType,
-                                currentTimeMillis() - duration).values()){
+                        for(String dataPoint : (Collection<String>) dataReader.findEntriesUpTo(getSensorType(),
+                                currentTimeMillis() - getDuration()).values()){
                             data.add(Long.valueOf(dataPoint));
                         }
                     } catch (RemoteException remoteEx){
                     }
 
-                    triggerValue = thresholdType == THRESHOLD_RISING ? max(data) - min(data) > threshold :
-                            max(data) - min(data) < threshold;
+                    triggerValue = getThresholdType() == THRESHOLD_RISING ? max(data) - min(data) > getThreshold() :
+                            max(data) - min(data) < getThreshold();
                     break;
             }
 
             if (triggerValue != isTriggered){
                 isTriggered = triggerValue;
                 reminder.onTriggerValueChange();
+                Log.d(reminder.getName(), "trigger triggered!");
             }
 
         }
@@ -286,13 +306,17 @@ public class Reminder {
             return isTriggered;
         }
 
+        private void attachToReminder(Reminder reminder){
+            this.reminder = reminder;
+        }
+
         private void registerTrigger(SensorListenerRegister listenerRegister,
                                      SensorDataReader dataReader){
             this.dataReader = dataReader;
             this.listenerRegister = listenerRegister;
 
             try {
-                this.listenerRegister.registerListener(sensorType, this);
+                this.listenerRegister.registerListener(getSensorType(), this);
             } catch (RemoteException remoteEx){
             }
         }
@@ -300,7 +324,7 @@ public class Reminder {
         private void unregisterTrigger(){
             if (listenerRegister != null) {
                 try {
-                    listenerRegister.unregisterListener(sensorType, this);
+                    listenerRegister.unregisterListener(getSensorType(), this);
                 } catch (RemoteException remoteEx) {
                 }
             }
@@ -332,22 +356,53 @@ public class Reminder {
                 }
             }
 
-            return new Trigger(reminder, sensorType, thresholdType, threshold, duration);
+            jsonReader.endObject();
+
+            return new Trigger(sensorType, thresholdType, threshold, duration);
         }
 
         private static void writeTrigger(JsonWriter jsonWriter, Trigger trigger) throws IOException {
             jsonWriter.beginObject();
 
-            jsonWriter.name(SENSOR_TYPE).value(trigger.sensorType);
-            jsonWriter.name(THRESHOLD_TYPE).value(trigger.thresholdType);
+            jsonWriter.name(SENSOR_TYPE).value(trigger.getSensorType());
+            jsonWriter.name(THRESHOLD_TYPE).value(trigger.getThresholdType());
 
-            jsonWriter.name(THRESHOLD).value(trigger.threshold);
-            jsonWriter.name(DURATION).value(trigger.duration);
+            jsonWriter.name(THRESHOLD).value(trigger.getThreshold());
+            jsonWriter.name(DURATION).value(trigger.getDuration());
 
             jsonWriter.endObject();
 
         }
 
+        public String getSensorType() { return sensorType; }
+
+        public void setSensorType(String sensorType) {
+            this.sensorType = sensorType;
+        }
+
+        public int getThresholdType() {
+            return thresholdType;
+        }
+
+        public void setThresholdType(int thresholdType) {
+            this.thresholdType = thresholdType;
+        }
+
+        public double getThreshold() {
+            return threshold;
+        }
+
+        public void setThreshold(double threshold) {
+            this.threshold = threshold;
+        }
+
+        public long getDuration() {
+            return duration;
+        }
+
+        public void setDuration(long duration) {
+            this.duration = duration;
+        }
     }
 
 }
