@@ -24,6 +24,10 @@ public class SkinTempCardFragment extends DataCardFragment {
         dataIcon.setImageResource(R.drawable.skin_temp);
         dataDisplayContainer.setBackgroundResource(R.color.data_card_skin_temp);
 
+        dataIdentifier.setLayoutParams(new LinearLayout.LayoutParams(
+                0, ViewGroup.LayoutParams.MATCH_PARENT, 13.5f)
+        );
+
         dataIcon.setLayoutParams(new LinearLayout.LayoutParams(
                 0, ViewGroup.LayoutParams.MATCH_PARENT, 3.5f));
 

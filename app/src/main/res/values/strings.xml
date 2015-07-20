@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">SURF-IoT 2015</string>
+    <string name="app_name">STARHealth</string>
 
     <string name="action_settings">Settings</string>
 
@@ -51,6 +51,8 @@
     <string name="title_activity_reminder">Reminders</string>
     <string name="title_activity_reminder_create">New Reminder</string>
     <string name="title_activity_tile_create"></string>
+    <string name="data_card_UV_data_units">level</string>
+    <string name="data_card_UV_data_identifier">Ultraviolet Exposure</string>
 
     <string-array name="reminder_active_options">
         <item>always</item>
@@ -68,10 +70,11 @@
         <item>CalorieSensor</item>
     </string-array>
 
-    <string-array name="trigger_types">
+    <string-array name="threshold_types">
         <item>above</item>
         <item>below</item>
         <item>rising</item>
         <item>falling</item>
+        <item>equals</item>
     </string-array>
 </resources>

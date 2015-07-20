@@ -9,10 +9,12 @@ import lab.star.surf_iot2015.data_card_fragment.DataCardFragment;
 import lab.star.surf_iot2015.data_card_fragment.HeartRateCardFragment;
 import lab.star.surf_iot2015.data_card_fragment.SkinTempCardFragment;
 import lab.star.surf_iot2015.data_card_fragment.StepCountCardFragment;
+import lab.star.surf_iot2015.data_card_fragment.UVCardFragment;
 import lab.star.surf_iot2015.data_settings_fragment.DataSettingsFragment;
 import lab.star.surf_iot2015.data_settings_fragment.HeartRateSettingsFragment;
 import lab.star.surf_iot2015.data_settings_fragment.SkinTempSettingsFragment;
 import lab.star.surf_iot2015.data_settings_fragment.StepCountSettingsFragment;
+import lab.star.surf_iot2015.data_settings_fragment.UVSettingsFragment;
 import lab.star.surf_iot2015.sensor.Sensor;
 import lab.star.surf_iot2015.service_user.DataReaderUser;
 import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
@@ -46,6 +48,10 @@ public class DataDetailsActivity extends BandActivity
             case Sensor.PEDOMETER_SENSOR:
                 dataCardFragment = new StepCountCardFragment();
                 dataSettingsFragment = new StepCountSettingsFragment();
+                break;
+            case Sensor.UV_SENSOR:
+                dataCardFragment = new UVCardFragment();
+                dataSettingsFragment = new UVSettingsFragment();
                 break;
         }
 

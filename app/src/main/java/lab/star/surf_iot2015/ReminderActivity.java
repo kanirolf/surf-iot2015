@@ -36,19 +36,12 @@ import static java.lang.Math.floor;
 
 public class ReminderActivity extends BandActivity implements ReminderManagerUser {
 
-    private ListView reminderView;
-    private View newReminderButton;
-
     private MenuFragment menuFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminder);
-
-        reminderView = (ListView) findViewById(R.id.reminderList);
-
-        newReminderButton = findViewById(R.id.newReminderButton);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -100,7 +93,7 @@ public class ReminderActivity extends BandActivity implements ReminderManagerUse
         nReminders = reminderFileNames.size();
 
         Log.d("ReminderActivty", String.format("%d reminders", nReminders));
-        newReminderButton.setOnClickListener(new View.OnClickListener() {
+        findViewById(R.id.newReminderButton).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(ReminderActivity.this, ReminderCreateActivity.class)
@@ -127,7 +120,7 @@ public class ReminderActivity extends BandActivity implements ReminderManagerUse
                 ViewGroup layout = (ViewGroup) getLayoutInflater()
                         .inflate(R.layout.element_reminder, parent, false);
 
-                Reminder currentReminder = getItem(position);
+                final Reminder currentReminder = getItem(position);
 
                 ((TextView) layout.findViewById(R.id.reminderName)).setText(
                         currentReminder.getName());
@@ -178,6 +171,19 @@ public class ReminderActivity extends BandActivity implements ReminderManagerUse
 
                     sensorsUsed.addView(sensorUsedCard);
                 }
+
+                layout.findViewById(R.id.editReminderButton)
+                      .setOnClickListener(new View.OnClickListener() {
+                          @Override
+                          public void onClick(View view) {
+                              startActivity(new Intent(ReminderActivity.this,
+                                      ReminderCreateActivity.class)
+                                      .setAction(ReminderCreateActivity.EDIT_REMINDER)
+                                      .putExtra(ReminderCreateActivity.REMINDER_NAME_SPECIFIER,
+                                              currentReminder.getName())
+                              );
+                          }
+                      });
 
                 return layout;
             };

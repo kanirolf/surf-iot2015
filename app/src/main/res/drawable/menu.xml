@@ -13,7 +13,7 @@
         android:right="12.5dp"
         android:bottom="28.75dp">
         <shape android:shape="rectangle" >
-            <solid android:color="@android:color/white" />
+            <solid android:color="?android:colorForeground" />
         </shape>
     </item>
 
@@ -23,7 +23,7 @@
         android:right="12.5dp"
         android:bottom="22.75dp">
         <shape android:shape="rectangle" >
-            <solid android:color="@android:color/white" />
+            <solid android:color="?android:colorForeground" />
         </shape>
     </item>
 
@@ -33,7 +33,7 @@
         android:right="12.5dp"
         android:bottom="16.75dp">
         <shape android:shape="rectangle" >
-            <solid android:color="@android:color/white" />
+            <solid android:color="?android:colorForeground" />
         </shape>
     </item>
 

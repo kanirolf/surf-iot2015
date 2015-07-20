@@ -5,19 +5,9 @@
 
     android:orientation="vertical"
 
-    tools:context="lab.star.surf_iot2015.ReminderActivity"
-    android:background="#77df77">
+    tools:context="lab.star.surf_iot2015.ReminderActivity">
 
-
-    <android.support.v7.widget.Toolbar
-
-        android:id="@+id/toolbar"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:minHeight="?android:attr/actionBarSize"
-        android:background="@color/background_material_dark"
-
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
+    <include layout="@layout/widget_toolbar" />
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -29,10 +19,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
 
-
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:paddingTop="10dp"
+
+            android:background="@color/affirmative"
             >
 
             <LinearLayout

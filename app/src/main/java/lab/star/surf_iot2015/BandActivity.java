@@ -45,9 +45,9 @@ abstract public class BandActivity extends AppCompatActivity implements BandConn
             unbindService(sensorTogglerConnection);
         }
         
-//        if (reminderManagerConnection != null){
-//            unbindService(reminderManagerConnection);
-//        }
+        if (reminderManagerConnection != null){
+            unbindService(reminderManagerConnection);
+        }
 
     }
 

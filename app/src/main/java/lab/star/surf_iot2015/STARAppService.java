@@ -32,6 +32,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.NavigableMap;
+import java.util.TreeMap;
 import java.util.UUID;
 
 import lab.star.surf_iot2015.reminder.Reminder;
@@ -40,6 +41,7 @@ import lab.star.surf_iot2015.sensor.PedometerSensor;
 import lab.star.surf_iot2015.sensor.Sensor;
 import lab.star.surf_iot2015.sensor.SkinContactSensor;
 import lab.star.surf_iot2015.sensor.SkinTempSensor;
+import lab.star.surf_iot2015.sensor.UVSensor;
 
 
 // This Service is responsible for communicating with the Band itself. Any Context which needs the
@@ -95,7 +97,7 @@ public class STARAppService extends Service {
 
     private ArrayDeque<HeartRateConsentDelegate> heartRateConsentDelegates = null;
 
-    private ArrayList<Reminder> reminders  = new ArrayList<Reminder>();
+    private TreeMap<String, Reminder> reminders  = new TreeMap<>();
     private UUID bandUUID = null;
 
     // When created, foreground this service, i.e. create a persistent notification that stays
@@ -110,7 +112,9 @@ public class STARAppService extends Service {
                 .setContentTitle("SURF-IoT 2015")
 
                         // TODO: create a dedicated icon for the notification
-                .setSmallIcon(R.drawable.heart_rate)
+                .setSmallIcon(R.drawable.starhealth_notif_icon)
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
+                        R.drawable.starhealth_notif_icon))
                 .setContentText("Sensors are currently being monitored.")
                 .setContentIntent(PendingIntent.getService(this, 0,
                         new Intent(this, STARAppService.class)
@@ -249,9 +253,13 @@ public class STARAppService extends Service {
                 break;
             case Sensor.SKIN_CONTACT_SENSOR:
                 sensor = new SkinContactSensor(client, this);
+                sensor.enable();
                 break;
             case Sensor.PEDOMETER_SENSOR:
                 sensor = new PedometerSensor(client, this);
+                break;
+            case Sensor.UV_SENSOR:
+                sensor = new UVSensor(client, this);
                 break;
 
             // Return null by default to skip sensors.put().
@@ -465,22 +473,16 @@ public class STARAppService extends Service {
             new ReminderManager.Stub() {
                 @Override
                 public List<String> getReminders() throws RemoteException {
-
-                    ArrayList<String> reminderFileNames = new ArrayList<>();
-                    for (Reminder reminder : reminders){
-                        reminderFileNames.add(reminder.getName());
-                    }
-                    return reminderFileNames;
+                    return new ArrayList<>(reminders.keySet());
                 }
 
                 @Override
                 public void setReminder(String reminderName, ReminderManagerRegisterer registerer)
                         throws RemoteException {
-
-
                     try {
                         Reminder newReminder = Reminder.fromJSON(STARAppService.this, reminderName);
-                        reminders.add(Reminder.fromJSON(STARAppService.this, reminderName));
+                        reminders.put(reminderName,
+                                Reminder.fromJSON(STARAppService.this, reminderName));
                         newReminder.registerReminder(STARAppService.this,
                                 sensorListenerRegisterInstance, sensorDataReaderInstance);
                     } catch (IOException ioEx){
@@ -491,6 +493,18 @@ public class STARAppService extends Service {
                         new createTileOnBand().execute();
                     }
                     registerer.onReminderRegisterSuccess();
+                }
+
+                @Override
+                public void removeReminder(String reminderName,
+                                           ReminderManagerUnregisterer unregisterer){
+                    if (reminders.containsKey(reminderName)){
+                        reminders.remove(reminderName).unregisterReminder();
+                    }
+                    try {
+                        unregisterer.onReminderUnregisterSuccess();
+                    } catch (RemoteException remoteEx){
+                    }
                 }
 
 

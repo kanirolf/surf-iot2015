@@ -20,6 +20,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeSet;
 
 import lab.star.surf_iot2015.STARAppService;
@@ -151,6 +152,12 @@ public class Reminder {
         this.dataReader = dataReader;
     }
 
+    public void unregisterReminder(){
+        for (Trigger trigger : triggers){
+            trigger.unregisterTrigger();
+        }
+    }
+
     public String getName(){
         return name;
     }
@@ -236,6 +243,8 @@ public class Reminder {
         public static final int THRESHOLD_RISING = 2;
         public static final int THRESHOLD_FALLING = 3;
 
+        public static final int EQUALS = 4;
+
         private static final String SENSOR_TYPE = "sensorType";
         private static final String THRESHOLD_TYPE = "thresholdType";
 
@@ -249,6 +258,7 @@ public class Reminder {
         private long duration;
 
         private boolean isTriggered = false;
+        private long activeSince = 0;
 
         private Reminder reminder = null;
 
@@ -266,30 +276,54 @@ public class Reminder {
 
         @Override
         public void valueChanged(String newValue){
-            boolean triggerValue = false;
+            if(currentTimeMillis() - activeSince < getDuration()){
+                return;
+            }
 
-            Log.d(reminder.getName(), "trigger called!");
+            boolean triggerValue = false;
+            double thisValue = Double.valueOf(newValue);
+
+            Map<Long, String> dataAsString = null;
+            try {
+                dataAsString = (Map<Long, String>) dataReader
+                    .findEntriesUpTo(getSensorType(), currentTimeMillis() - getDuration());
+            } catch (RemoteException remoteEx){
+            }
+
+            Log.d(reminder.getName(), String.format("trigger called! %d", getThresholdType()));
             switch (getThresholdType()){
                 case THRESHOLD_ABOVE:
-                    triggerValue = Double.valueOf(newValue) > getThreshold();
+                    for (String dataPoint : dataAsString.values()){
+                        if (Double.valueOf(dataPoint) < getThreshold()){
+                            break;
+                        }
+                    }
+                    triggerValue = true;
                     break;
                 case THRESHOLD_BELOW:
-                    triggerValue = Double.valueOf(newValue) < getThreshold();
+                    for (String dataPoint : dataAsString.values()){
+                        if (Double.valueOf(dataPoint) > getThreshold()){
+                            break;
+                        }
+                    }
+                    triggerValue = true;
                     break;
                 case THRESHOLD_RISING:
-                case THRESHOLD_FALLING:
-                    TreeSet<Long> data = null;
-                    try {
-                        for(String dataPoint : (Collection<String>) dataReader.findEntriesUpTo(getSensorType(),
-                                currentTimeMillis() - getDuration()).values()){
-                            data.add(Long.valueOf(dataPoint));
-                        }
-                    } catch (RemoteException remoteEx){
+                    double minValue = thisValue;
+                    for (String dataPoint : dataAsString.values()) {
+                        minValue = Math.min(minValue, Double.valueOf(dataPoint));
                     }
-
-                    triggerValue = getThresholdType() == THRESHOLD_RISING ? max(data) - min(data) > getThreshold() :
-                            max(data) - min(data) < getThreshold();
+                    triggerValue = thisValue - minValue > getThreshold();
                     break;
+                case THRESHOLD_FALLING:
+                    double maxValue = thisValue;
+                    for (String dataPoint : dataAsString.values()) {
+                        maxValue = Math.max(maxValue, Double.valueOf(dataPoint));
+                    }
+                    triggerValue = maxValue - thisValue > getThreshold();
+                    break;
+                case EQUALS:
+                    triggerValue = thisValue == getThreshold();
             }
 
             if (triggerValue != isTriggered){
@@ -314,6 +348,7 @@ public class Reminder {
                                      SensorDataReader dataReader){
             this.dataReader = dataReader;
             this.listenerRegister = listenerRegister;
+            this.activeSince = currentTimeMillis();
 
             try {
                 this.listenerRegister.registerListener(getSensorType(), this);

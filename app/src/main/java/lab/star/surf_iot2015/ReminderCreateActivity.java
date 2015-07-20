@@ -1,16 +1,16 @@
 package lab.star.surf_iot2015;
 
+import android.content.Context;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -19,8 +19,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 
@@ -32,14 +30,14 @@ import static java.lang.Math.floor;
 
 
 public class ReminderCreateActivity extends BandActivity
-        implements ReminderManagerUser, ReminderManagerRegisterer{
+        implements ReminderManagerUser, ReminderManagerRegisterer, ReminderManagerUnregisterer{
 
     public static final String REMINDER_NAME_SPECIFIER = "reminderNameSpecifier";
 
     public static final String NEW_REMINDER = "lab.star.surf_iot2015.NewReminder";
     public static final String EDIT_REMINDER = "lab.star.surf_iot2015.EditReminder";
 
-    private Reminder newReminder;
+    private Reminder thisReminder;
     private ArrayAdapter<Reminder.Trigger> triggerArrayAdapter;
 
     @Override
@@ -51,16 +49,16 @@ public class ReminderCreateActivity extends BandActivity
         setContentView(R.layout.activity_reminder_create);
 
         if (getIntent().getAction().equals(NEW_REMINDER)) {
-            newReminder = new Reminder(getIntent().getStringExtra(REMINDER_NAME_SPECIFIER));
+            thisReminder = new Reminder(getIntent().getStringExtra(REMINDER_NAME_SPECIFIER));
         } else {
             try {
-                newReminder = Reminder.fromJSON(this, getIntent().getStringExtra(REMINDER_NAME_SPECIFIER));
+                thisReminder = Reminder.fromJSON(this, getIntent().getStringExtra(REMINDER_NAME_SPECIFIER));
             } catch (IOException ioEx){
             }
         }
 
-        EditText reminderNameField = (EditText) findViewById(R.id.reminderNameField);
-        reminderNameField.setText(newReminder.getName());
+        final EditText reminderNameField = (EditText) findViewById(R.id.reminderNameField);
+        reminderNameField.setText(thisReminder.getName());
         reminderNameField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -72,7 +70,17 @@ public class ReminderCreateActivity extends BandActivity
 
             @Override
             public void afterTextChanged(Editable editable) {
-                newReminder.setName(editable.toString());
+                thisReminder.setName(editable.toString());
+            }
+        });
+
+        findViewById(R.id.clearReminderNameFieldButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                reminderNameField.setText("");
+                ((InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE))
+                        .showSoftInput(reminderNameField, InputMethodManager.SHOW_IMPLICIT);
+
             }
         });
 
@@ -82,20 +90,23 @@ public class ReminderCreateActivity extends BandActivity
 
         Spinner activeTimeField = (Spinner) findViewById(R.id.activeTimeField);
         activeTimeField.setAdapter(activeTimeAdapter);
-        activeTimeField.setSelection(activeTimeAdapter.getPosition("active"));
+        activeTimeField.setSelection(activeTimeAdapter.getPosition("always"));
         activeTimeField.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-              @Override
-              public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
-                  newReminder.setActiveTime(-1, -1);
-              }
+                                                      @Override
+                                                      public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                                                          thisReminder.setActiveTime(-1, -1);
+                                                      }
 
-              @Override
-              public void onNothingSelected(AdapterView<?> adapterView) {
-              }
-          }
+                                                      @Override
+                                                      public void onNothingSelected(AdapterView<?> adapterView) {
+                                                      }
+                                                  }
         );
 
         EditText messageField = (EditText) findViewById(R.id.reminderMessageField);
+        if (!thisReminder.getReminderText().isEmpty()) {
+            messageField.setText(thisReminder.getReminderText());
+        }
         messageField.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -107,11 +118,12 @@ public class ReminderCreateActivity extends BandActivity
 
             @Override
             public void afterTextChanged(Editable editable) {
-                newReminder.setReminderText(editable.toString());
+                thisReminder.setReminderText(editable.toString());
             }
         });
 
-        triggerArrayAdapter = new ArrayAdapter<Reminder.Trigger>(this, R.layout.element_trigger) {
+        triggerArrayAdapter = new ArrayAdapter<Reminder.Trigger>(this, R.layout.element_trigger,
+                thisReminder.getTriggers()) {
 
                     @Override
                     public View getView(int position, View convertView, ViewGroup parent) {
@@ -144,7 +156,7 @@ public class ReminderCreateActivity extends BandActivity
                         });
 
                         final ArrayAdapter<CharSequence> triggerTypes = ArrayAdapter.createFromResource(
-                                ReminderCreateActivity.this, R.array.trigger_types,
+                                ReminderCreateActivity.this, R.array.threshold_types,
                                 android.R.layout.simple_spinner_dropdown_item);
 
                         Spinner triggerTypeField = (Spinner) layout.findViewById(R.id.triggerTypeField);
@@ -218,7 +230,7 @@ public class ReminderCreateActivity extends BandActivity
                         70,
                         30000
                 );
-                newReminder.addTrigger(newTrigger);
+                thisReminder.addTrigger(newTrigger);
                 triggerArrayAdapter.insert(newTrigger, 0);
             }
         });
@@ -245,23 +257,29 @@ public class ReminderCreateActivity extends BandActivity
             @Override
             public void onClick(View view) {
                 boolean success = true;
+                if (getIntent().getAction().equals(EDIT_REMINDER)){
+                    try {
+                        reminderManager.removeReminder(
+                                getIntent().getStringExtra(REMINDER_NAME_SPECIFIER),
+                                ReminderCreateActivity.this);
+                    } catch (RemoteException remoteEx){
+                    }
+                }
                 try {
-                    newReminder.toJSON(ReminderCreateActivity.this);
+                    thisReminder.toJSON(ReminderCreateActivity.this);
                 } catch (IOException ioEx) {
                     onReminderRegisterFailure();
                     success = false;
                 }
                 if (success) {
                     try {
-                        reminderManager.setReminder(newReminder.getName(), ReminderCreateActivity.this);
+                        reminderManager.setReminder(thisReminder.getName(), ReminderCreateActivity.this);
                     } catch (RemoteException remoteEx) {
                     }
                 }
             }
         });
     }
-
-
 
     @Override
     public void onReminderRegisterSuccess(){
@@ -272,6 +290,18 @@ public class ReminderCreateActivity extends BandActivity
     @Override
     public void onReminderRegisterFailure(){
         Log.d("ReminderOnCreate", "failed to register reminder.");
+    }
+
+    @Override
+    public void onReminderUnregisterSuccess(){
+        Log.d("ReminderOnCreate", "unregistered reminder!");
+
+        finish();
+    }
+
+    @Override
+    public void onReminderUnregisterFailure(){
+        Log.d("ReminderOnCreate", "failed to unregister reminder.");
     }
 
     private static void triggerToSensor(String sensor, LinearLayout triggerView){

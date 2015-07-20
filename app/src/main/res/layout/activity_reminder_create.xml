@@ -53,7 +53,8 @@
             android:src="@drawable/cancel"
 
             android:scaleType="fitCenter"
-            android:background="@android:color/transparent" />
+            android:background="@android:color/transparent"
+            android:id="@+id/clearReminderNameFieldButton" />
 
         <Space
             android:layout_width="0dp"
