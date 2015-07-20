@@ -22,7 +22,7 @@ public class HeartRateConsentActivity extends Activity implements HeartRateConse
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_heart_rate_consent);
+        setContentView(R.layout.activity_band_user_interaction);
     }
 
     @Override

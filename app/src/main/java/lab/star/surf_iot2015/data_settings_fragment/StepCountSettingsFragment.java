@@ -5,7 +5,6 @@ import android.graphics.Path;
 import android.os.RemoteException;
 import android.widget.TextView;
 
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Map;

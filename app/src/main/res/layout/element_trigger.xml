@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="120dp"
+
+    android:background="@android:color/white"
+
+    android:weightSum="12">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:layout_weight="3"
+
+        android:weightSum="20">
+
+
+        <include layout="@layout/element_sensor_used"
+
+            android:id="@+id/triggerSensorIcon"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="5.5"
+            />
+
+        <Spinner android:id="@+id/triggerSensorField"
+
+            android:layout_height="match_parent"
+            android:layout_width="0dp"
+
+            android:layout_weight="14.5"
+
+            android:gravity="center_vertical|end"
+            android:fontFamily="sans-serif-light"
+            android:textSize="20sp"
+            />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:orientation="horizontal"
+        android:layout_weight="3">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"/>
+
+        <Spinner android:id="@+id/triggerTypeField"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="6.5"
+
+            android:background="#e6e6e6"
+
+            android:fontFamily="sans-serif-light"
+            android:textSize="15sp"
+            android:gravity="center"
+            android:textColor="#808080"
+            />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"/>
+
+        <EditText android:id="@+id/triggerValueField"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="5"
+
+            android:background="#e6e6e6"
+            android:fontFamily="sans-serif-light"
+            android:textSize="15sp"
+            android:textColor="#808080"
+
+            android:inputType="numberDecimal"
+            />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="0.5"/>
+
+        <TextView android:id="@+id/triggerSensorUnits"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="6"
+
+            android:fontFamily="sans-serif-light"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
+            android:gravity="center_vertical|start"
+
+            />
+
+
+    </LinearLayout>
+
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:layout_weight="1"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+
+        android:orientation="horizontal"
+        android:layout_weight="3">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="3"
+
+            android:fontFamily="sans-serif-light"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
+            android:gravity="center"
+
+            android:text="over"
+            />
+
+        <EditText android:id="@+id/triggerDurationField"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="5"
+
+            android:background="#e6e6e6"
+            android:fontFamily="sans-serif-light"
+            android:textSize="15sp"
+            android:textColor="#808080"
+
+            android:inputType="numberDecimal"
+            />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1"/>
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="9"
+
+            android:fontFamily="sans-serif-light"
+            android:textColor="@android:color/black"
+            android:textSize="15sp"
+            android:gravity="center_vertical|start"
+
+            android:text="seconds"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>

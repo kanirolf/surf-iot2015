@@ -1,120 +1,140 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
 
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
+    android:orientation="vertical"
+
     android:theme="@style/LinearLayoutVerticalWeighted"
 
     >
 
-    <LinearLayout
+    <include layout="@layout/widget_toolbar" />
 
-        android:id="@+id/dataConsoleMood"
-
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-
-        android:background="@color/affirmative"
-        android:orientation="vertical"
-
-        android:theme="@style/LinearLayoutVerticalWeighted"
-
-        android:weightSum="48"
-    >
+        android:id="@+id/content">
 
         <LinearLayout
-            android:layout_weight="5"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:id="@+id/dataConsoleMood"
+            android:background="@color/affirmative">
 
-            android:orientation="horizontal"
+            <LinearLayout
 
-            android:paddingLeft="20dp"
-            android:paddingRight="20dp"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
 
-            android:theme="@style/LinearLayoutHorizontalWeighted"
+                android:orientation="vertical"
 
-            android:weightSum="28">
+                android:theme="@style/LinearLayoutVerticalWeighted"
 
-            <Space android:layout_weight="1" />
+                android:weightSum="48"
+            >
 
-            <ImageView
-                android:id="@+id/bandIsOnImage"
+                <LinearLayout
+                    android:layout_weight="5"
 
-                android:layout_weight="7"
+                    android:orientation="horizontal"
 
-                android:src="@drawable/armband_vertical" />
+                    android:paddingLeft="20dp"
+                    android:paddingRight="20dp"
 
-            <Space
-                android:id="@+id/bandIsOnSpacer"
+                    android:theme="@style/LinearLayoutHorizontalWeighted"
 
-                android:layout_weight="10.5" />
+                    android:weightSum="28">
 
-            <TextView
-                android:id="@+id/bandIsOnStatic"
+                    <Space android:layout_weight="1" />
 
-                android:layout_weight="5"
+                    <ImageView
+                        android:id="@+id/bandIsOnImage"
 
-                android:gravity="bottom"
+                        android:layout_weight="7"
 
-                android:paddingBottom="10dp"
-                android:text="band is"
-                android:textColor="@android:color/white"
+                        android:src="@drawable/armband_vertical"
+                        android:visibility="invisible" />
 
-                android:textSize="18dp" />
+                    <Space
+                        android:id="@+id/bandIsOnSpacer"
 
-            <TextView
-                android:id="@+id/bandIsOnStatus"
+                        android:layout_weight="10.5" />
 
-                android:layout_weight="4.5"
+                    <TextView
+                        android:id="@+id/bandIsOnStatic"
 
-                android:gravity="bottom"
+                        android:layout_weight="5"
 
-                android:paddingBottom="5dp"
-                android:text="ON"
-                android:textColor="@android:color/white"
-                android:textSize="35dp"
+                        android:gravity="bottom"
 
-                android:textStyle="bold" />
+                        android:paddingBottom="10dp"
+                        android:text="band is"
+                        android:textColor="@android:color/white"
 
+                        android:textSize="18dp" />
+
+                    <TextView
+                        android:id="@+id/bandIsOnStatus"
+
+                        android:layout_weight="6"
+
+                        android:gravity="bottom"
+
+                        android:paddingBottom="5dp"
+                        android:text="ON"
+                        android:textColor="@android:color/white"
+                        android:textSize="35dp"
+
+                        android:textStyle="bold" />
+
+                </LinearLayout>
+
+                <fragment android:name="lab.star.surf_iot2015.data_card_fragment.HeartRateCardFragment"
+
+                    android:id="@+id/heartRateCard"
+                    tools:layout="@layout/fragment_data_card"
+
+                    android:layout_weight="8"
+                    />
+
+                <Space android:layout_weight="1" />
+
+                <fragment android:name="lab.star.surf_iot2015.data_card_fragment.SkinTempCardFragment"
+
+                    android:id="@+id/skinTempCard"
+                    tools:layout="@layout/fragment_data_card"
+
+                    android:layout_weight="8"
+                    />
+
+                <Space android:layout_weight="1" />
+
+
+                <fragment android:name="lab.star.surf_iot2015.data_card_fragment.StepCountCardFragment"
+
+                    android:id="@+id/stepCountCard"
+                    tools:layout="@layout/fragment_data_card"
+
+                    android:layout_weight="8"
+                    />
+
+                <Space android:layout_weight="1" />
+
+                <fragment android:name="lab.star.surf_iot2015.data_card_fragment.UVCardFragment"
+
+                    android:id="@+id/UVCard"
+                    tools:layout="@layout/fragment_data_card"
+
+                    android:layout_weight="8"
+                    />
+
+
+            </LinearLayout>
         </LinearLayout>
+    </RelativeLayout>
 
-        <fragment android:name="lab.star.surf_iot2015.data_card_fragment.HeartRateCardFragment"
-
-            android:id="@+id/heartRateCard"
-            tools:layout="@layout/fragment_data_card"
-
-            android:layout_weight="8"
-            />
-
-        <Space android:layout_weight="1" />
-
-        <fragment android:name="lab.star.surf_iot2015.data_card_fragment.SkinTempCardFragment"
-
-            android:id="@+id/skinTempCard"
-            tools:layout="@layout/fragment_data_card"
-
-            android:layout_weight="8"
-            />
-
-        <Space android:layout_weight="1" />
-
-
-        <fragment android:name="lab.star.surf_iot2015.data_card_fragment.StepCountCardFragment"
-
-            android:id="@+id/stepCountCard"
-            tools:layout="@layout/fragment_data_card"
-
-            android:layout_weight="8"
-            />
-
-
-    </LinearLayout>
-
-    <View android:id="@+id/dataConsoleInactiveOverlay"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
-        android:background="#99000000"
-        />
-
-</RelativeLayout>
+</LinearLayout>

@@ -42,13 +42,13 @@ public class StepCountCardFragment extends DataCardFragment implements DataReade
         dataDisplayContainer.setBackgroundResource(R.color.data_card_step_count);
 
         dataIdentifier.setLayoutParams(new LinearLayout.LayoutParams(0,
-                ViewGroup.LayoutParams.MATCH_PARENT, 6f));
+                ViewGroup.LayoutParams.MATCH_PARENT, 7f));
         dataIcon.setLayoutParams(new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.MATCH_PARENT, 3f));
         dataValue.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 24);
 
         fullLayout.findViewById(R.id.dataIdentifierSpacer).setLayoutParams(new LinearLayout.LayoutParams(
-                0, ViewGroup.LayoutParams.MATCH_PARENT, 9f));
+                0, ViewGroup.LayoutParams.MATCH_PARENT, 8f));
 
     }
 

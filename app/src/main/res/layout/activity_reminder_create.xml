@@ -1,0 +1,262 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp"
+    android:paddingTop="10dp"
+
+    android:orientation="vertical"
+    tools:context="lab.star.surf_iot2015.ReminderCreateActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+
+        android:background="@android:color/white"
+        android:orientation="horizontal"
+
+        android:weightSum="30">
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1.5"/>
+
+        <EditText android:id="@+id/reminderNameField"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="16.5"
+
+            android:fontFamily="sans-serif-light"
+            android:textSize="20dp"
+            android:gravity="center_vertical|start"
+
+            android:background="@android:color/transparent"
+            android:text="Reminder #1"
+             />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="0.5"/>
+
+        <ImageButton
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="1.5"
+
+            android:src="@drawable/cancel"
+
+            android:scaleType="fitCenter"
+            android:background="@android:color/transparent"
+            android:id="@+id/clearReminderNameFieldButton" />
+
+        <Space
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="2"/>
+
+        <Button android:id="@+id/reminderSaveButton"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="8"
+
+            android:background="#8080ff"
+
+            android:fontFamily="sans-serif-bold"
+            android:textStyle="bold"
+            android:textColor="@android:color/white"
+            android:gravity="center"
+            android:text="save"/>
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="50dp">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:layout_weight="10"
+
+            android:padding="10dp"
+
+            android:background="@android:color/white"
+
+            android:fontFamily="sans-serif-light"
+            android:textColor="#808080"
+            android:gravity="center_vertical|start"
+            android:text="active"
+            android:textSize="20sp"
+
+            />
+
+        <Spinner android:id="@+id/activeTimeField"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+
+            android:background="#e6e6e6"
+            android:layout_weight="20" />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+
+            android:layout_weight="10"
+
+            android:padding="10dp"
+
+            android:background="@android:color/white"
+
+            android:fontFamily="sans-serif-light"
+            android:textColor="#808080"
+            android:gravity="center_vertical|start"
+            android:text="message"
+            android:textSize="20sp"
+
+            />
+
+        <EditText android:id="@+id/reminderMessageField"
+
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minHeight="50dp"
+            android:padding="10dp"
+
+            android:layout_weight="20"
+            android:layout_gravity="start"
+            android:background="#e6e6e6"
+
+            android:fontFamily="sans-serif-light"
+            android:textColor="#808080"
+            android:textSize="15sp"
+
+            android:gravity="top|end"
+
+            android:text=""
+            android:hint="Enter a message you want to receive when this reminder is triggered."
+             />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="10dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="50dp"
+
+            android:layout_weight="10"
+
+            android:padding="10dp"
+
+            android:background="@android:color/white"
+
+            android:fontFamily="sans-serif-light"
+            android:textColor="#808080"
+            android:gravity="center_vertical|start"
+            android:text="triggers"
+            android:textSize="20sp"
+
+            />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+
+            android:layout_weight="20"
+
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:padding="10dp"
+
+                android:background="#e6e6e6"
+                android:orientation="horizontal"
+
+                android:weightSum="18"
+                android:id="@+id/newTriggerButton">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+
+                    android:layout_weight="6.5"/>
+
+                <ImageView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+
+                    android:layout_weight="2"
+
+                    android:src="@drawable/add_square"
+
+                    android:scaleType="fitStart"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+
+                    android:layout_weight="9.5"
+                    android:gravity="top|start"
+                    android:textSize="20sp"
+                    android:fontFamily="sans-serif-light"
+                    android:textColor="#808080"
+                    android:text="add trigger"/>
+
+            </LinearLayout>
+
+            <Space
+                android:layout_width="match_parent"
+                android:layout_height="10dp" />
+
+            <ListView android:id="@+id/triggerList"
+
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+</LinearLayout>
