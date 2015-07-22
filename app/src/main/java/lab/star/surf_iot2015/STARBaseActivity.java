@@ -1,24 +1,27 @@
 package lab.star.surf_iot2015;
 
-import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
+import android.support.v7.app.AppCompatActivity;
 
 import java.util.EnumSet;
 
 import lab.star.surf_iot2015.services.ServiceNode;
 import lab.star.surf_iot2015.services.ServiceType;
 
-abstract public class STARBaseActivity extends Activity
-        implements ServiceNode.Wrapper, STARAppServiceUser {
+abstract public class STARBaseActivity extends AppCompatActivity
+        implements ServiceNode.Container, STARAppServiceUser {
 
     private ServiceNode serviceNode;
 
-    // implement ServiceNode.Wrapper
+    @Override
+    public IBinder asBinder(){ return null;}
+
+    // implement ServiceNode.Container
     @Override
     abstract public EnumSet<ServiceType> defineServicesNeeded();
 
@@ -46,6 +49,8 @@ abstract public class STARBaseActivity extends Activity
         startService(starServiceIntent);
 
         bindService(starServiceIntent, connectionToService, BIND_WAIVE_PRIORITY);
+
+        serviceNode = new ServiceNode(this);
     }
 
     @Override
@@ -65,6 +70,8 @@ abstract public class STARBaseActivity extends Activity
                 case REMINDER_SERVICE:
                     unbindService(reminderServiceConnect);
                     break;
+                case HEART_RATE_CONSENT_SERVICE:
+                    unbindService(heartRateConsentConnect);
             }
         }
     }
@@ -85,6 +92,9 @@ abstract public class STARBaseActivity extends Activity
                     break;
                 case REMINDER_SERVICE:
                     getReminderService();
+                    break;
+                case HEART_RATE_CONSENT_SERVICE:
+                    getHeartRateConsentService();
                     break;
             }
         }
@@ -119,6 +129,12 @@ abstract public class STARBaseActivity extends Activity
         bindService(getReminderServiceIntent, reminderServiceConnect, BIND_WAIVE_PRIORITY);
     }
 
+    protected void getHeartRateConsentService(){
+        Intent getHeartRateConsentIntent = new Intent(this, STARAppService.class);
+        getHeartRateConsentIntent.setAction(STARAppService.GET_HEART_RATE_CONSENT);
+
+        bindService(getHeartRateConsentIntent, heartRateConsentConnect, BIND_WAIVE_PRIORITY);
+    }
     // define ServiceConnections corresponding to each connection method
     private ServiceConnection listenerServiceConnect = new ServiceConnection() {
         @Override
@@ -154,6 +170,17 @@ abstract public class STARBaseActivity extends Activity
         @Override
         public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
             serviceNode.giveReminderService(ReminderService.Stub.asInterface(iBinder));
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {}
+    };
+
+    private ServiceConnection heartRateConsentConnect = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            serviceNode.giveHeartRateConsentService(HeartRateConsentService.Stub
+                .asInterface(iBinder));
         }
 
         @Override

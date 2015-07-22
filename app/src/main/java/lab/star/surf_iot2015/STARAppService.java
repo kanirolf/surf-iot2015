@@ -18,6 +18,7 @@ import java.util.ArrayList;
 
 import lab.star.surf_iot2015.dialogs.CheckBandPairedDialog;
 import lab.star.surf_iot2015.services.DataReaderManager;
+import lab.star.surf_iot2015.services.HeartRateConsentManager;
 import lab.star.surf_iot2015.services.ListenerManager;
 import lab.star.surf_iot2015.services.ReminderManager;
 import lab.star.surf_iot2015.services.STARAppServiceStartManager;
@@ -27,6 +28,10 @@ import lab.star.surf_iot2015.services.TileManager;
 
 
 public class STARAppService extends Service {
+
+    public static final String TILE_CREATED = "lab.star.surf_iot2015.TileCreated";
+
+    public static final String TILE_UUID_SPECIFIER = "UUIDSpecifier";
 
     // ACTION constants to use with Intent.setAction() with an Intent sent to bindService();
     // each returns an Interface as specified in onBind()
@@ -46,11 +51,16 @@ public class STARAppService extends Service {
     private BandClient client;
 
     private STARAppServiceStartManager starAppServiceStartManager = new STARAppServiceStartManager();
+
+
     private SensorManager sensorManager;
     private ListenerManager listenerManager;
     private DataReaderManager dataReaderManager;
     private SensorTogglerManager sensorTogglerManager;
+
     private TileManager tileManager;
+
+    private HeartRateConsentManager heartRateConsentManager;
     private ReminderManager reminderManager;
 
     private boolean initialized = false;
@@ -106,6 +116,8 @@ public class STARAppService extends Service {
 
             tileManager = new TileManager(client, this);
 
+            heartRateConsentManager = new HeartRateConsentManager(this);
+
             reminderManager = new ReminderManager(this, listenerManager, dataReaderManager, tileManager);
 
             PendingIntent serviceTogglerIntent = PendingIntent.getActivity(this, 0,
@@ -157,8 +169,8 @@ public class STARAppService extends Service {
                     return reminderManager;
 
                 // TODO: implement HeartRateConsentManager/Service/usw./usf.
-//                case GET_HEART_RATE_CONSENT:
-//                    return heartRateConsentInstance;
+                case GET_HEART_RATE_CONSENT:
+                    return heartRateConsentManager;
 
             }
         }

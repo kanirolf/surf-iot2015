@@ -3,6 +3,7 @@ package lab.star.surf_iot2015.services;
 import java.util.EnumSet;
 
 import lab.star.surf_iot2015.DataReaderService;
+import lab.star.surf_iot2015.HeartRateConsentService;
 import lab.star.surf_iot2015.ListenerService;
 import lab.star.surf_iot2015.ReminderService;
 import lab.star.surf_iot2015.SensorTogglerService;
@@ -11,9 +12,9 @@ import lab.star.surf_iot2015.SensorTogglerService;
  * <p>A ServiceNode is considered to be a node which a service resource, as indicated
  * by ServiceType, passes through. Objects that use a Service can "wrap" themselves around the
  * ServiceNode, thereby having access to services through the ServiceNode and becoming
- * ServiceNode.Wrapper instances. Each ServiceNode.Wrapper instance can be notified of service
- * acquisition through onServicesAcquired(). An object that contains at least one ServiceNode.Wrapper
- * instance must itself be a ServiceNode.Wrapper.
+ * ServiceNode.Container instances. Each ServiceNode.Container instance can be notified of service
+ * acquisition through onServicesAcquired(). An object that contains at least one ServiceNode.Container
+ * instance must itself be a ServiceNode.Container.
  *
  * <p>A ServiceNode instance is considered to be in a valid state once it has the services
  * it needs to function properly. Therefore, when subclassing ServiceNode,
@@ -37,13 +38,14 @@ public class ServiceNode {
     private ListenerService listenerService;
     private SensorTogglerService sensorTogglerService;
     private ReminderService reminderService;
+    private HeartRateConsentService heartRateConsentService;
 
-    private final Wrapper wrapper;
+    private final Container container;
 
-    public ServiceNode(Wrapper wrapper){
-        this.wrapper = wrapper;
+    public ServiceNode(Container container){
+        this.container = container;
 
-        servicesNeeded = this.wrapper.defineServicesNeeded();
+        servicesNeeded = this.container.defineServicesNeeded();
     }
 
     /**
@@ -91,6 +93,11 @@ public class ServiceNode {
         markAcquired(ServiceType.REMINDER_SERVICE);
     }
 
+    public void giveHeartRateConsentService(HeartRateConsentService heartRateConsentService){
+        this.heartRateConsentService = heartRateConsentService;
+        markAcquired(ServiceType.HEART_RATE_CONSENT_SERVICE);
+    }
+
     /**
      * Call this to get the acquired DataReaderService instance. Note that this is null if
      * SensorType.DATA_READER_SERVICE is not indicated in defineServicesNeeded().
@@ -131,6 +138,11 @@ public class ServiceNode {
         return reminderService;
     }
 
+
+    public HeartRateConsentService getHeartRateConsentService() {
+        return heartRateConsentService;
+    }
+
     /**
      * Called to update the services currently acquired by removing them from servicesNeeded.
      * Once servicesNeeded is empty (i.e. no more services are needed,) onServicesAcquired()
@@ -141,11 +153,12 @@ public class ServiceNode {
     private void markAcquired(ServiceType serviceType){
         this.servicesNeeded.remove(serviceType);
         if (this.servicesNeeded.isEmpty()){
-            wrapper.onServicesAcquired();
+            container.onServicesAcquired();
         }
     }
 
-    public interface Wrapper {
+
+    public interface Container {
 
         EnumSet<ServiceType> defineServicesNeeded();
         void onServicesAcquired();
