@@ -1,5 +1,6 @@
 package lab.star.surf_iot2015;
 
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.RemoteException;
@@ -15,16 +16,15 @@ import android.widget.TextView;
 
 import com.microsoft.band.sensors.BandContactState;
 
+import java.util.EnumSet;
+
 import lab.star.surf_iot2015.data_card_fragment.DataCardFragment;
-import lab.star.surf_iot2015.data_card_fragment.StepCountCardFragment;
 import lab.star.surf_iot2015.dialogs.CheckBandOnDialog;
 import lab.star.surf_iot2015.sensor.SensorType;
-import lab.star.surf_iot2015.service_user.DataReaderUser;
-import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
+import lab.star.surf_iot2015.services.ServiceType;
 
 
-public class MainDataConsoleActivity extends BandActivity
-        implements ListenerRegistererUser, DataReaderUser, HeartRateConsentDelegate {
+public class MainDataConsoleActivity extends STARBaseActivity implements HeartRateConsentUser {
 
     private LinearLayout dataConsoleMood;
 
@@ -32,15 +32,19 @@ public class MainDataConsoleActivity extends BandActivity
     private Space bandIsOnSpacer;
     private TextView bandIsOnStatus;
 
-    private boolean heartRateConsent = false;
+    private DataCardFragment heartRateCard;
+    private DataCardFragment skinTempCard;
+    private DataCardFragment stepCountCard;
+    private DataCardFragment UVCard;
 
     private MenuFragment menuFragment = null;
 
+    private boolean heartRateConsent = false;
 
     // gets the Views responsible for displaying Skin Contact (i.e. the Views at the top of the
     // screen that say "band is on" or "band is off" and starts STARAppService
     @Override
-    protected void onCreate (Bundle savedInstanceState) {
+    public void onCreate (Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_data_console);
 
@@ -48,6 +52,13 @@ public class MainDataConsoleActivity extends BandActivity
         bandIsOnImage = (ImageView) findViewById(R.id.bandIsOnImage);
         bandIsOnSpacer = (Space) findViewById(R.id.bandIsOnSpacer);
         bandIsOnStatus = (TextView) findViewById(R.id.bandIsOnStatus);
+
+        FragmentManager fragmentManager = getFragmentManager();
+
+        heartRateCard = (DataCardFragment) fragmentManager.findFragmentById(R.id.heartRateCard);
+        skinTempCard = (DataCardFragment) fragmentManager.findFragmentById(R.id.skinTempCard);
+        stepCountCard = (DataCardFragment) fragmentManager.findFragmentById(R.id.stepCountCard);
+        UVCard = (DataCardFragment) fragmentManager.findFragmentById(R.id.UVCard);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -73,78 +84,73 @@ public class MainDataConsoleActivity extends BandActivity
         });
         toolbar.setNavigationIcon(R.drawable.menu);
 
-        initializeService();
-
     }
 
     @Override
-    public void onResume(){
-        super.onResume();
+    public EnumSet<ServiceType> defineServicesNeeded() {
+        EnumSet<ServiceType> servicesNeeded = EnumSet.noneOf(ServiceType.class);
 
-        connectToBand();
-    }
+        servicesNeeded.add(ServiceType.HEART_RATE_CONSENT_SERVICE);
 
-    // ungreys the activity and registers the listeners for Band contact (i.e. is the Band on?),
-    // Band connection, and probably listeners for each of the data panels (although they should
-    // be Fragments to simplify things)
-    @Override
-    public void onBandConnectSuccess(){
-        getHeartRateConsent(this);
-        getDataReader(this);
-    }
+        // get services needed by fragments
+        servicesNeeded.addAll(heartRateCard.defineServicesNeeded());
+        servicesNeeded.addAll(skinTempCard.defineServicesNeeded());
+        servicesNeeded.addAll(stepCountCard.defineServicesNeeded());
+        servicesNeeded.addAll(UVCard.defineServicesNeeded());
 
-    @Override
-    public void onHeartRateConsentYes(){
-        Log.d("MainDataConsoleActivity", "heart rate consent yes!");
-        heartRateConsent = true;
-        getListenerRegisterer(this);
+        return servicesNeeded;
     }
 
     @Override
-    public void onHeartRateConsentNo(){
-        getListenerRegisterer(this);
-    }
+    public void onServicesAcquired() {
+        ListenerService listenerService = getUnderlyingNode().getListenerService();
+        DataReaderService dataReaderService = getUnderlyingNode().getDataReaderService();
 
-    @Override
-    public void onAcquireListenerRegisterer (SensorListenerRegister sensorListenerRegister){
+        skinTempCard.getUnderlyingNode().giveListenerService(listenerService);
+        stepCountCard.getUnderlyingNode().giveListenerService(listenerService);
+        UVCard.getUnderlyingNode().giveListenerService(listenerService);
 
-        if (heartRateConsent) {
-            ((DataCardFragment) getFragmentManager().findFragmentById(R.id.heartRateCard))
-                    .onAcquireListenerRegisterer(sensorListenerRegister);
-        }
-        ((DataCardFragment) getFragmentManager().findFragmentById(R.id.skinTempCard))
-                .onAcquireListenerRegisterer(sensorListenerRegister);
-        ((DataCardFragment) getFragmentManager().findFragmentById(R.id.stepCountCard))
-                .onAcquireListenerRegisterer(sensorListenerRegister);
+        stepCountCard.getUnderlyingNode().giveDataReaderService(dataReaderService);
 
         try {
-            sensorListenerRegister.registerListener(SensorType.SKIN_CONTACT_SENSOR,
-                new SensorServiceCallback() {
-                    @Override
-                    public void valueChanged(String newValue) throws RemoteException {
-                        switch (Enum.valueOf(BandContactState.class, newValue)) {
-                            case WORN:
-                                bandIsOn();
-                                break;
-                            case NOT_WORN:
-                                bandIsOff();
-                                break;
-                        }
-                    }
+            getUnderlyingNode().getHeartRateConsentService().getHeartRateConsent(this);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
 
-                    @Override
-                    public IBinder asBinder() {
-                        return null;
-                    }
-                });
+        try {
+            listenerService.registerListener(
+                    SensorType.SKIN_CONTACT_SENSOR.toString(),
+                    new SensorListenerCallback() {
+                        @Override
+                        public void onValueChange(String newValue) throws RemoteException {
+                            switch (Enum.valueOf(BandContactState.class, newValue)) {
+                                case WORN:
+                                    bandIsOn();
+                                    break;
+                                case NOT_WORN:
+                                    bandIsOff();
+                                    break;
+                            }
+                        }
+
+                        @Override
+                        public IBinder asBinder() {
+                            return null;
+                        }
+                    });
         } catch (RemoteException ex) {
         }
+
     }
 
     @Override
-    public void onAcquireDataReader(SensorDataReader dataReader){
-        ((StepCountCardFragment) getFragmentManager().findFragmentById(R.id.stepCountCard))
-                .onAcquireDataReader(dataReader);
+    public void onHeartRateConsentReceived(boolean hasConsent) {
+        if (hasConsent){
+            heartRateCard.getUnderlyingNode().giveListenerService(
+                    getUnderlyingNode().getListenerService()
+            );
+        }
     }
 
     // ---------------------------------------------------------------------------------------------
@@ -191,6 +197,8 @@ public class MainDataConsoleActivity extends BandActivity
 
                 // set status to OFF :(
                 bandIsOnStatus.setText("OFF");
+
+                showBandNotOn();
             }
         });
 
@@ -203,5 +211,4 @@ public class MainDataConsoleActivity extends BandActivity
     private void showBandNotOn(){
         new CheckBandOnDialog().show(getFragmentManager(), "BandNotOn");
     }
-
 }

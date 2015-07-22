@@ -15,6 +15,9 @@ import static java.util.Collections.min;
 public class UVCardFragment extends DataCardFragment {
 
     @Override
+    protected SensorType getSensorType(){ return SensorType.UV_SENSOR; }
+
+    @Override
     protected void setActiveStyle(LinearLayout fullLayout, TextView dataValue,
                                   TextView dataUnits, TextView dataIdentifier,
                                   ImageView dataIcon, LinearLayout dataDisplayContainer){
@@ -37,6 +40,4 @@ public class UVCardFragment extends DataCardFragment {
 
     }
 
-    @Override
-    protected String getSensorType(){ return SensorType.UV_SENSOR; }
 }

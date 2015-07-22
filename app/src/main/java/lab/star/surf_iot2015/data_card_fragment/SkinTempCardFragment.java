@@ -34,6 +34,6 @@ public class SkinTempCardFragment extends DataCardFragment {
     }
 
     @Override
-    protected String getSensorType(){ return SensorType.SKIN_TEMP_SENSOR; }
+    protected SensorType getSensorType(){ return SensorType.SKIN_TEMP_SENSOR; }
 
 }

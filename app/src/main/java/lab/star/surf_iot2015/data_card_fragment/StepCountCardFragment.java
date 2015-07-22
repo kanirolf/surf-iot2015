@@ -10,20 +10,21 @@ import android.widget.TextView;
 import java.util.ArrayDeque;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.EnumSet;
 import java.util.GregorianCalendar;
 
 import lab.star.surf_iot2015.R;
-import lab.star.surf_iot2015.SensorDataReader;
 import lab.star.surf_iot2015.sensor.SensorType;
-import lab.star.surf_iot2015.service_user.DataReaderUser;
+import lab.star.surf_iot2015.services.ServiceType;
 
 import static java.util.Collections.max;
 import static java.util.Collections.min;
 
 // Specialization of DataCardFragment responsible for displaying step count
-public class StepCountCardFragment extends DataCardFragment implements DataReaderUser {
+public class StepCountCardFragment extends DataCardFragment {
 
-    private SensorDataReader dataReader;
+    @Override
+    protected SensorType getSensorType(){ return SensorType.PEDOMETER_SENSOR; }
 
     @Override
     protected void setActiveStyle(LinearLayout fullLayout, TextView dataValue,
@@ -49,7 +50,7 @@ public class StepCountCardFragment extends DataCardFragment implements DataReade
 
     @Override
     protected void updateValue(String newValue){
-        if (dataReader != null){
+        if (getUnderlyingNode().getDataReaderService() != null){
 
             Collection<Long> values = new ArrayDeque<Long>();
             Calendar todayMidnight = new GregorianCalendar();
@@ -60,8 +61,9 @@ public class StepCountCardFragment extends DataCardFragment implements DataReade
             todayMidnight.set(Calendar.MILLISECOND, 0);
 
             try {
-                for (String value : (Collection<String>) dataReader
-                        .findEntriesUpTo(SensorType.PEDOMETER_SENSOR, todayMidnight.getTimeInMillis())
+                for (String value : (Collection<String>) getUnderlyingNode().getDataReaderService()
+                        .getEntriesFrom(SensorType.PEDOMETER_SENSOR.toString(),
+                                todayMidnight.getTimeInMillis())
                         .values()){
                     values.add(Long.valueOf(value));
                 }
@@ -72,13 +74,14 @@ public class StepCountCardFragment extends DataCardFragment implements DataReade
         }
     }
 
-
     @Override
-    public void onAcquireDataReader(SensorDataReader dataReader){
-        this.dataReader = dataReader;
+    public EnumSet<ServiceType> defineServicesNeeded(){
+        EnumSet servicesNeeded = super.defineServicesNeeded();
+        servicesNeeded.add(ServiceType.DATA_READER_SERVICE);
+
+        return servicesNeeded;
     }
 
-    @Override
-    protected String getSensorType(){ return SensorType.PEDOMETER_SENSOR; }
+
 
 }

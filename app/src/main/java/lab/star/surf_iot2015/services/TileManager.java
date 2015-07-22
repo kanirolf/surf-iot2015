@@ -41,7 +41,8 @@ public class TileManager {
                     TileManager.this.tileUUID = UUID.randomUUID();
 
                     Intent getTilePermissionIntent = new Intent(context, TileCreateActivity.class)
-                            .putExtra(TileManager.UUID_SPECIFIER, TileManager.this.tileUUID);
+                            .putExtra(TileManager.UUID_SPECIFIER, TileManager.this.tileUUID)
+                            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     context.startActivity(getTilePermissionIntent);
                 } else {
                     TileManager.this.tileUUID = tiles.get(0).getTileId();

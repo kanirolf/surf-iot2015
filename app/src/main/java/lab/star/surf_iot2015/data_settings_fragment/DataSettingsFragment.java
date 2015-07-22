@@ -26,9 +26,10 @@ import lab.star.surf_iot2015.SensorListenerRegister;
 import lab.star.surf_iot2015.SensorServiceCallback;
 import lab.star.surf_iot2015.SensorToggler;
 import lab.star.surf_iot2015.service_user.SensorTogglerUser;
+import lab.star.surf_iot2015.services.ServiceNode;
 
 abstract public class DataSettingsFragment extends Fragment
-    implements SurfaceHolder.Callback, ListenerRegistererUser, DataReaderUser, SensorTogglerUser,
+    implements ServiceNode.Container, SurfaceHolder.Callback,
                SharedPreferences.OnSharedPreferenceChangeListener {
 
     // Paints for painting on the Graph. These cannot be configured on construction, so these are

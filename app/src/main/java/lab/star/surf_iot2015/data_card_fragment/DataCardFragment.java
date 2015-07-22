@@ -1,9 +1,7 @@
 package lab.star.surf_iot2015.data_card_fragment;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -15,20 +13,24 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import java.util.EnumSet;
+
 import lab.star.surf_iot2015.DataDetailsActivity;
-import lab.star.surf_iot2015.sensor.SensorType;
-import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
 import lab.star.surf_iot2015.R;
-import lab.star.surf_iot2015.SensorListenerRegister;
-import lab.star.surf_iot2015.SensorServiceCallback;
+import lab.star.surf_iot2015.SensorListenerCallback;
+import lab.star.surf_iot2015.SensorTogglerUser;
+import lab.star.surf_iot2015.sensor.SensorType;
+import lab.star.surf_iot2015.services.ServiceNode;
+import lab.star.surf_iot2015.services.ServiceType;
 
 // Base Fragment class for data cards: elements that are responsible for displaying sensor data
 // Don't use this directly; subclass it and override onCreateView to personalize it. :D
-public abstract class DataCardFragment extends Fragment implements ListenerRegistererUser,
-        SharedPreferences.OnSharedPreferenceChangeListener {
+public abstract class DataCardFragment extends Fragment
+        implements ServiceNode.Container, SensorTogglerUser {
 
     protected String sensor;
-    private SensorListenerRegister sensorListenerRegister;
+
+    private ServiceNode serviceNode;
 
     private LinearLayout fragmentLayout;
 
@@ -37,11 +39,14 @@ public abstract class DataCardFragment extends Fragment implements ListenerRegis
 
     // this specifies the Card's sensor; it is used in onAcquireListenerRegisterer to register
     // the listener with the sensor.
-    abstract protected String getSensorType();
+    abstract protected SensorType getSensorType();
 
     abstract protected void setActiveStyle(LinearLayout fullLayout, TextView dataValue,
                                            TextView dataUnits, TextView dataIdentifier,
                                            ImageView dataIcon, LinearLayout dataDisplayContainer);
+
+    @Override
+    public IBinder asBinder(){ return null; }
 
     // retrieves the base data card layout from fragment_data_card.xml. call super.onCreateView()
     // to get this
@@ -74,11 +79,7 @@ public abstract class DataCardFragment extends Fragment implements ListenerRegis
     public void onResume(){
         super.onResume();
 
-        SharedPreferences prefs = getActivity()
-                .getSharedPreferences(SensorType.SENSOR_TOGGLE_FILE, Context.MODE_PRIVATE);
-
-        prefs.registerOnSharedPreferenceChangeListener(this);
-        onSharedPreferenceChanged(prefs, null);
+        serviceNode = new ServiceNode(this);
     }
 
     // it's probably good form to unregister the listener if it's bound
@@ -86,30 +87,23 @@ public abstract class DataCardFragment extends Fragment implements ListenerRegis
     public void onPause(){
         super.onPause();
 
-        getActivity().getSharedPreferences(SensorType.SENSOR_TOGGLE_FILE, Context.MODE_PRIVATE)
-                .unregisterOnSharedPreferenceChangeListener(this);
-
-        if (sensorListenerRegister != null){
+        if (getUnderlyingNode().getListenerService()!= null){
             try {
-                sensorListenerRegister.unregisterListener(getSensorType(), sensorServiceCallback);
+                getUnderlyingNode().getListenerService().unregisterListener(
+                        getSensorType().toString(), sensorListenerCallback);
             } catch (RemoteException remoteEx){
             }
         }
     }
 
     @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key){
-        setActiveStyle(fragmentLayout,
-                ((TextView) fragmentLayout.findViewById(R.id.dataValue)),
-                ((TextView) fragmentLayout.findViewById(R.id.dataUnits)),
-                ((TextView) fragmentLayout.findViewById(R.id.dataIdentifier)),
-                ((ImageView) fragmentLayout.findViewById(R.id.dataIcon)),
-                ((LinearLayout) fragmentLayout.findViewById(R.id.dataDisplayContainer))
-        );
-        if (!sharedPreferences.getBoolean(getSensorType(), false)){
-            valueDisplay.setText("--");
-            dataDisplayContainer.setBackgroundColor(Color.argb(0xFF, 0x99, 0x99, 0x99));
-        }
+    public ServiceNode getUnderlyingNode(){
+        return serviceNode;
+    }
+
+    @Override
+    public EnumSet<ServiceType> defineServicesNeeded(){
+        return EnumSet.of(ServiceType.LISTENER_SERVICE);
     }
 
     // This should be called to use the Band's sensor listeners to update the DataCard's state.
@@ -117,11 +111,29 @@ public abstract class DataCardFragment extends Fragment implements ListenerRegis
     // it should override onAcquireListenerRegisterer and call this method to still have the Card's
     // value display still update.
     @Override
-    public void onAcquireListenerRegisterer(SensorListenerRegister sensorListenerRegister){
+    public void onServicesAcquired(){
         try {
-            this.sensorListenerRegister = sensorListenerRegister;
-            sensorListenerRegister.registerListener(getSensorType(), sensorServiceCallback);
+            getUnderlyingNode().getListenerService().registerListener(
+                    getSensorType().toString(), sensorListenerCallback);
+            getUnderlyingNode().getSensorTogglerService().notifyOnSensorToggle(
+                    getSensorType().toString(), this);
         } catch (RemoteException remoteEx){
+        }
+
+    }
+
+    @Override
+    public void onSensorToggleChange(boolean isEnabled){
+        setActiveStyle(fragmentLayout,
+                ((TextView) fragmentLayout.findViewById(R.id.dataValue)),
+                ((TextView) fragmentLayout.findViewById(R.id.dataUnits)),
+                ((TextView) fragmentLayout.findViewById(R.id.dataIdentifier)),
+                ((ImageView) fragmentLayout.findViewById(R.id.dataIcon)),
+                ((LinearLayout) fragmentLayout.findViewById(R.id.dataDisplayContainer))
+        );
+        if (!isEnabled){
+            valueDisplay.setText("--");
+            dataDisplayContainer.setBackgroundColor(Color.argb(0xFF, 0x99, 0x99, 0x99));
         }
     }
 
@@ -137,9 +149,9 @@ public abstract class DataCardFragment extends Fragment implements ListenerRegis
 
     // SensorServiceCallback that will update the sensor's data display when a new value
     // is received
-    protected SensorServiceCallback sensorServiceCallback = new SensorServiceCallback() {
+    protected SensorListenerCallback sensorListenerCallback = new SensorListenerCallback() {
         @Override
-        public void valueChanged(String newValue) throws RemoteException {
+        public void onValueChange(String newValue) throws RemoteException {
             updateValue(newValue);
         }
 

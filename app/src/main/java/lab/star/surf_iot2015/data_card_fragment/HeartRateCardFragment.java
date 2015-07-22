@@ -24,6 +24,6 @@ public class HeartRateCardFragment extends DataCardFragment {
     }
 
     @Override
-    protected String getSensorType(){ return SensorType.HEART_RATE_SENSOR; }
+    protected SensorType getSensorType(){ return SensorType.HEART_RATE_SENSOR; }
 
 }

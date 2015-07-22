@@ -159,7 +159,6 @@ public class ServiceNode {
 
 
     public interface Container {
-
         EnumSet<ServiceType> defineServicesNeeded();
         void onServicesAcquired();
 
