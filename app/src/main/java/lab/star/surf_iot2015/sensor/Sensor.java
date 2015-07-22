@@ -22,23 +22,11 @@ import java.util.List;
 import java.util.NavigableMap;
 import java.util.TreeMap;
 
-import lab.star.surf_iot2015.SensorServiceCallback;
+import lab.star.surf_iot2015.SensorListenerCallback;
 
 public abstract class Sensor {
 
-    public static final String SENSOR_TOGGLE_FILE = "SensorToggleFile";
-
-    // Constants used to specify sensor, to be used when communicating to the Service through
-    // any of its Interfaces.
-    public static final String ACCEL_SENSOR = "AccelSensor";
-    public static final String GYRO_SENSOR = "GyroSensor";
-    public static final String DISTANCE_SENSOR = "DistanceSensor";
-    public static final String HEART_RATE_SENSOR = "HeartRateSensor";
-    public static final String PEDOMETER_SENSOR = "PedometerSensor";
-    public static final String SKIN_TEMP_SENSOR = "SkinTempSensor";
-    public static final String SKIN_CONTACT_SENSOR = "SkinContactSensor";
-    public static final String UV_SENSOR = "UVSensor";
-    public static final String CALORIE_SENSOR = "CalorieSensor";
+    protected static final String SENSOR_TOGGLE_FILE = "SensorToggleFile";
 
     protected BandClient client;
     protected Context context;
@@ -48,10 +36,10 @@ public abstract class Sensor {
     private String name;
 
     protected DataGraph data;
-    protected ArrayDeque<SensorServiceCallback> callbacks = new ArrayDeque<SensorServiceCallback>();
+    protected ArrayDeque<SensorListenerCallback> callbacks = new ArrayDeque<SensorListenerCallback>();
 
-    Sensor (String sensorName, BandClient newClient, Context newContext){
-        name = sensorName;
+    Sensor (SensorType sensorName, BandClient newClient, Context newContext){
+        name = sensorName.toString();
 
         client = newClient;
         context = newContext;
@@ -60,7 +48,7 @@ public abstract class Sensor {
         enabled = preferences.getBoolean(name, false);
 
         try {
-            data = new DataGraph(sensorName, newContext);
+            data = new DataGraph(name, newContext);
         } catch (Exception ex) {
             Log.d("Sensor()->", "error:", ex);
         }
@@ -93,12 +81,12 @@ public abstract class Sensor {
         disableResolution();
     }
 
-    public void registerListener(SensorServiceCallback callback){
+    public void registerListener(SensorListenerCallback callback){
 
         callbacks.add(callback);
     }
 
-    public void unregisterListener(SensorServiceCallback callback){
+    public void unregisterListener(SensorListenerCallback callback){
         callbacks.remove(callback);
     }
 

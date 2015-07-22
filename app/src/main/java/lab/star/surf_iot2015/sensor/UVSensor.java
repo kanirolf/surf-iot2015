@@ -5,12 +5,10 @@ import android.os.RemoteException;
 
 import com.microsoft.band.BandClient;
 import com.microsoft.band.BandIOException;
-import com.microsoft.band.sensors.BandSkinTemperatureEvent;
-import com.microsoft.band.sensors.BandSkinTemperatureEventListener;
 import com.microsoft.band.sensors.BandUVEvent;
 import com.microsoft.band.sensors.BandUVEventListener;
 
-import lab.star.surf_iot2015.SensorServiceCallback;
+import lab.star.surf_iot2015.SensorListenerCallback;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -19,12 +17,12 @@ import static java.lang.System.currentTimeMillis;
  */
 public class UVSensor extends Sensor {
 
-    private static final String SENSOR_NAME = Sensor.UV_SENSOR;
+    private static final SensorType SENSOR_TYPE = SensorType.UV_SENSOR;
 
     private BandUVEventListener eventListener;
 
     public UVSensor (BandClient client, Context context){
-        super(SENSOR_NAME, client, context);
+        super(SENSOR_TYPE, client, context);
     }
 
     @Override
@@ -37,9 +35,9 @@ public class UVSensor extends Sensor {
                 String valAsString = bandUVEvent.getUVIndexLevel().toString();
                 data.addEntry(currentTimeMillis(), valAsString);
 
-                for (SensorServiceCallback callback : callbacks){
+                for (SensorListenerCallback callback : callbacks){
                     try {
-                        callback.valueChanged(valAsString);
+                        callback.onValueChange(valAsString);
                     } catch (RemoteException remoteEx){
                     }
                 }

@@ -1,34 +1,22 @@
 package lab.star.surf_iot2015;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.RemoteException;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.text.Layout;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
-import android.widget.Spinner;
 import android.widget.TextView;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 import lab.star.surf_iot2015.reminder.Reminder;
-import lab.star.surf_iot2015.sensor.Sensor;
 import lab.star.surf_iot2015.service_user.ReminderManagerUser;
 
 import static java.lang.Math.floor;
@@ -149,15 +137,15 @@ public class ReminderActivity extends BandActivity implements ReminderManagerUse
                     int background = 0;
 
                     switch (sensor){
-                        case Sensor.HEART_RATE_SENSOR:
+                        case HEART_RATE_SENSOR:
                             icon = R.drawable.heart_rate;
                             background = R.color.data_card_heart_rate;
                             break;
-                        case Sensor.SKIN_TEMP_SENSOR:
+                        case SKIN_TEMP_SENSOR:
                             icon = R.drawable.skin_temp;
                             background = R.color.data_card_skin_temp;
                             break;
-                        case Sensor.PEDOMETER_SENSOR:
+                        case PEDOMETER_SENSOR:
                             icon = R.drawable.step_count;
                             background = R.color.data_card_step_count;
                     }

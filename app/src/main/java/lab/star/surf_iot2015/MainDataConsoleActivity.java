@@ -18,7 +18,7 @@ import com.microsoft.band.sensors.BandContactState;
 import lab.star.surf_iot2015.data_card_fragment.DataCardFragment;
 import lab.star.surf_iot2015.data_card_fragment.StepCountCardFragment;
 import lab.star.surf_iot2015.dialogs.CheckBandOnDialog;
-import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.sensor.SensorType;
 import lab.star.surf_iot2015.service_user.DataReaderUser;
 import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
 
@@ -118,7 +118,7 @@ public class MainDataConsoleActivity extends BandActivity
                 .onAcquireListenerRegisterer(sensorListenerRegister);
 
         try {
-            sensorListenerRegister.registerListener(Sensor.SKIN_CONTACT_SENSOR,
+            sensorListenerRegister.registerListener(SensorType.SKIN_CONTACT_SENSOR,
                 new SensorServiceCallback() {
                     @Override
                     public void valueChanged(String newValue) throws RemoteException {

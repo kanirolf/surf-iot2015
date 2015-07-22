@@ -8,19 +8,19 @@ import com.microsoft.band.BandIOException;
 import com.microsoft.band.sensors.BandContactEvent;
 import com.microsoft.band.sensors.BandContactEventListener;
 
-import lab.star.surf_iot2015.SensorServiceCallback;
+import lab.star.surf_iot2015.SensorListenerCallback;
 
 import static java.lang.System.currentTimeMillis;
 
 
 public class SkinContactSensor extends Sensor {
 
-    private static final String SENSOR_NAME = SKIN_CONTACT_SENSOR;
+    private static final SensorType SENSOR_TYPE = SensorType.SKIN_CONTACT_SENSOR;
 
     private BandContactEventListener eventListener;
 
     public SkinContactSensor (BandClient client, Context context){
-        super(SENSOR_NAME, client, context);
+        super(SENSOR_TYPE, client, context);
     }
 
     @Override
@@ -33,9 +33,9 @@ public class SkinContactSensor extends Sensor {
                 String valAsString = bandContactEvent.getContactState().toString();
                 data.addEntry(currentTimeMillis(),valAsString);
 
-                for (SensorServiceCallback callback : callbacks){
+                for (SensorListenerCallback callback : callbacks){
                     try {
-                        callback.valueChanged(valAsString);
+                        callback.onValueChange(valAsString);
                     } catch (RemoteException remoteEx){
                     }
                 }

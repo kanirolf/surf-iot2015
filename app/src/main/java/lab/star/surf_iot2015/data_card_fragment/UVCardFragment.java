@@ -7,7 +7,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import lab.star.surf_iot2015.R;
-import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.sensor.SensorType;
 
 import static java.util.Collections.max;
 import static java.util.Collections.min;
@@ -38,5 +38,5 @@ public class UVCardFragment extends DataCardFragment {
     }
 
     @Override
-    protected String getSensorType(){ return Sensor.UV_SENSOR; }
+    protected String getSensorType(){ return SensorType.UV_SENSOR; }
 }

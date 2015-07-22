@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import lab.star.surf_iot2015.SensorDataReader;
-import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.sensor.SensorType;
 
 import static java.lang.Math.ceil;
 
@@ -21,7 +21,7 @@ public class StepCountSettingsFragment extends DataSettingsFragment {
 
     @Override
     protected String getSensorType(){
-        return Sensor.PEDOMETER_SENSOR;
+        return SensorType.PEDOMETER_SENSOR;
     }
 
     @Override

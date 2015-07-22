@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import lab.star.surf_iot2015.SensorDataReader;
-import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.sensor.SensorType;
 
 import static java.lang.Math.abs;
 import static java.lang.Math.ceil;
@@ -25,7 +25,7 @@ public class HeartRateSettingsFragment extends DataSettingsFragment {
 
     @Override
     protected String getSensorType(){
-        return Sensor.HEART_RATE_SENSOR;
+        return SensorType.HEART_RATE_SENSOR;
     }
 
     @Override

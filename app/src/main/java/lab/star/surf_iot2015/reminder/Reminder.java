@@ -3,7 +3,6 @@ package lab.star.surf_iot2015.reminder;
 import android.content.Context;
 import android.os.IBinder;
 import android.os.RemoteException;
-import android.support.annotation.NonNull;
 import android.util.JsonReader;
 import android.util.JsonWriter;
 import android.util.Log;
@@ -18,19 +17,16 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
-import lab.star.surf_iot2015.STARAppService;
-import lab.star.surf_iot2015.SensorDataReader;
-import lab.star.surf_iot2015.SensorListenerRegister;
-import lab.star.surf_iot2015.SensorServiceCallback;
+import lab.star.surf_iot2015.DataReaderService;
+import lab.star.surf_iot2015.ListenerService;
+import lab.star.surf_iot2015.ReminderService;
+import lab.star.surf_iot2015.SensorListenerCallback;
+import lab.star.surf_iot2015.services.TileManager;
 
 import static java.lang.System.currentTimeMillis;
-import static java.util.Collections.max;
-import static java.util.Collections.min;
 
 public class Reminder {
 
@@ -51,9 +47,9 @@ public class Reminder {
     private HashSet<String> sensors = new HashSet<String>();
     private Collection<Trigger> triggers = new ArrayDeque<Trigger>();
 
-    private STARAppService serviceInstance;
-    private SensorDataReader dataReader;
-    private SensorListenerRegister listenerRegister;
+    private TileManager tileManager;
+    private DataReaderService dataReader;
+    private ListenerService listenerRegister;
 
     public Reminder (String name){
         this.name = name;
@@ -142,12 +138,12 @@ public class Reminder {
 
     }
 
-    public void registerReminder(STARAppService serviceInstance,
-                                 SensorListenerRegister listenerRegister, SensorDataReader dataReader){
+    public void registerReminder(TileManager tileManager,
+                                 ListenerService listenerRegister, DataReaderService dataReader){
         for (Trigger trigger : triggers){
             trigger.registerTrigger(listenerRegister, dataReader);
         }
-        this.serviceInstance = serviceInstance;
+        this.tileManager = tileManager;
         this.listenerRegister = listenerRegister;
         this.dataReader = dataReader;
     }
@@ -230,12 +226,12 @@ public class Reminder {
             return;
         }
 
-        if (serviceInstance != null) {
-            serviceInstance.messageToTile(name, reminderText);
+        if (tileManager != null) {
+            tileManager.sendMessageToBand(name, reminderText);
         }
     }
 
-    public static class Trigger implements SensorServiceCallback {
+    public static class Trigger implements SensorListenerCallback {
 
         public static final int THRESHOLD_ABOVE = 0;
         public static final int THRESHOLD_BELOW = 1;
@@ -262,8 +258,8 @@ public class Reminder {
 
         private Reminder reminder = null;
 
-        private SensorListenerRegister listenerRegister;
-        private SensorDataReader dataReader;
+        private ListenerService listenerRegister;
+        private DataReaderService dataReader;
 
         public Trigger (String sensorType, int thresholdType, double threshold, long duration){
 
@@ -275,7 +271,7 @@ public class Reminder {
         }
 
         @Override
-        public void valueChanged(String newValue){
+        public void onValueChange(String newValue){
             if(currentTimeMillis() - activeSince < getDuration()){
                 return;
             }
@@ -286,7 +282,7 @@ public class Reminder {
             Map<Long, String> dataAsString = null;
             try {
                 dataAsString = (Map<Long, String>) dataReader
-                    .findEntriesUpTo(getSensorType(), currentTimeMillis() - getDuration());
+                    .getEntriesFrom(getSensorType(), currentTimeMillis() - getDuration());
             } catch (RemoteException remoteEx){
             }
 
@@ -344,8 +340,8 @@ public class Reminder {
             this.reminder = reminder;
         }
 
-        private void registerTrigger(SensorListenerRegister listenerRegister,
-                                     SensorDataReader dataReader){
+        private void registerTrigger(ListenerService listenerRegister,
+                                     DataReaderService dataReader){
             this.dataReader = dataReader;
             this.listenerRegister = listenerRegister;
             this.activeSince = currentTimeMillis();

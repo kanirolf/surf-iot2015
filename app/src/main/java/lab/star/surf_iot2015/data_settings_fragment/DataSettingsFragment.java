@@ -17,6 +17,7 @@ import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import lab.star.surf_iot2015.sensor.SensorType;
 import lab.star.surf_iot2015.service_user.DataReaderUser;
 import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
 import lab.star.surf_iot2015.R;
@@ -25,7 +26,6 @@ import lab.star.surf_iot2015.SensorListenerRegister;
 import lab.star.surf_iot2015.SensorServiceCallback;
 import lab.star.surf_iot2015.SensorToggler;
 import lab.star.surf_iot2015.service_user.SensorTogglerUser;
-import lab.star.surf_iot2015.sensor.Sensor;
 
 abstract public class DataSettingsFragment extends Fragment
     implements SurfaceHolder.Callback, ListenerRegistererUser, DataReaderUser, SensorTogglerUser,
@@ -89,7 +89,7 @@ abstract public class DataSettingsFragment extends Fragment
         surfaceHolder.removeCallback(this);
         surfaceHolderSafe = false;
 
-        getActivity().getSharedPreferences(Sensor.SENSOR_TOGGLE_FILE, Context.MODE_PRIVATE)
+        getActivity().getSharedPreferences(SensorType.SENSOR_TOGGLE_FILE, Context.MODE_PRIVATE)
             .unregisterOnSharedPreferenceChangeListener(this);
 
         if (listenerRegister != null){
@@ -151,7 +151,7 @@ abstract public class DataSettingsFragment extends Fragment
 
 
     private void onListenerRegisterAndSurface(){
-        SharedPreferences prefs = getActivity().getSharedPreferences(Sensor.SENSOR_TOGGLE_FILE,
+        SharedPreferences prefs = getActivity().getSharedPreferences(SensorType.SENSOR_TOGGLE_FILE,
                 Context.MODE_PRIVATE);
 
         prefs.registerOnSharedPreferenceChangeListener(this);
