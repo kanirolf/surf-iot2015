@@ -8,12 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeMap;
 
-import lab.star.surf_iot2015.ReminderManagerRegisterer;
-import lab.star.surf_iot2015.ReminderManagerUnregisterer;
+import lab.star.surf_iot2015.ReminderService;
 import lab.star.surf_iot2015.STARAppService;
 import lab.star.surf_iot2015.reminder.Reminder;
 
-public class ReminderManager implements lab.star.surf_iot2015.ReminderManager {
+public class ReminderManager extends ReminderService.Stub {
 
     private final STARAppService service;
     private final ListenerManager listenerManager;
@@ -40,50 +39,42 @@ public class ReminderManager implements lab.star.surf_iot2015.ReminderManager {
     }
 
     @Override
-    public void setReminder(String reminderName, ReminderManagerRegisterer registerer)
+    public void setReminder(String reminderName)
             throws RemoteException {
         Reminder addedReminder = null;
         try {
             addedReminder = Reminder.fromJSON(service, reminderName);
         } catch (IOException ex){
-            registerer.onReminderRegisterFailure();
             return;
         }
         reminders.put(reminderName, addedReminder);
-        addedReminder.registerReminder(service, listenerManager, dataReaderManager);
-        registerer.onReminderRegisterSuccess();
+        addedReminder.registerReminder(tileManager, listenerManager, dataReaderManager);
     }
 
     @Override
-    public void removeReminder(String reminderName, ReminderManagerUnregisterer registerer)
+    public void removeReminder(String reminderName)
             throws RemoteException {
         if (reminders.containsKey(reminderName)){
             reminders.remove(reminderName).unregisterReminder();
         }
-        registerer.onReminderUnregisterSuccess();
     }
 
     @Override
-    public void replaceReminder(String toReplace, String replacement,
-                                ReminderManagerUnregisterer unregisterer,
-                                ReminderManagerRegisterer registerer)
+    public void replaceReminder(String toReplace, String replacement)
             throws RemoteException {
 
         if (reminders.containsKey(toReplace)){
             reminders.remove(toReplace).unregisterReminder();
         }
-        unregisterer.onReminderUnregisterSuccess();
 
         Reminder addedReminder = null;
         try {
             addedReminder = Reminder.fromJSON(service, replacement);
         } catch (IOException ex){
-            registerer.onReminderRegisterFailure();
             return;
         }
         reminders.put(replacement, addedReminder);
-        addedReminder.registerReminder(service, listenerManager, dataReaderManager);
-        registerer.onReminderRegisterSuccess();
+        addedReminder.registerReminder(tileManager, listenerManager, dataReaderManager);
 
     }
 

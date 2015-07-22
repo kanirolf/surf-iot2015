@@ -1,15 +1,12 @@
 package lab.star.surf_iot2015.data_card_fragment;
 
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import lab.star.surf_iot2015.R;
-import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.sensor.SensorType;
 
 // Specialization of DataCardFragment responsible for displaying skin temperature
 public class SkinTempCardFragment extends DataCardFragment {
@@ -37,6 +34,6 @@ public class SkinTempCardFragment extends DataCardFragment {
     }
 
     @Override
-    protected String getSensorType(){ return Sensor.SKIN_TEMP_SENSOR; }
+    protected String getSensorType(){ return SensorType.SKIN_TEMP_SENSOR; }
 
 }

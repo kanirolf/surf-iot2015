@@ -54,7 +54,7 @@
             android:windowSoftInputMode="adjustPan|adjustResize" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="lab.star.surf_iot2015.ReminderActivity" />
+                android:value=".ReminderActivity" />
         </activity>
 
         <activity

@@ -15,7 +15,7 @@ import java.util.TreeMap;
 
 import lab.star.surf_iot2015.R;
 import lab.star.surf_iot2015.SensorDataReader;
-import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.sensor.SensorType;
 
 import static java.lang.System.currentTimeMillis;
 
@@ -36,7 +36,7 @@ public class UVSettingsFragment extends DataSettingsFragment {
 
     @Override
     protected String getSensorType() {
-        return Sensor.UV_SENSOR;
+        return SensorType.UV_SENSOR;
     }
 
     @Override

@@ -9,7 +9,6 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,7 +22,7 @@ import android.widget.TextView;
 import java.io.IOException;
 
 import lab.star.surf_iot2015.reminder.Reminder;
-import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.sensor.SensorType;
 import lab.star.surf_iot2015.service_user.ReminderManagerUser;
 
 import static java.lang.Math.floor;
@@ -225,7 +224,7 @@ public class ReminderCreateActivity extends BandActivity
             @Override
             public void onClick(View view) {
                 Reminder.Trigger newTrigger = new Reminder.Trigger(
-                        Sensor.HEART_RATE_SENSOR,
+                        SensorType.HEART_RATE_SENSOR,
                         Reminder.Trigger.THRESHOLD_ABOVE,
                         70,
                         30000
@@ -312,17 +311,17 @@ public class ReminderCreateActivity extends BandActivity
         int units = 0;
 
         switch (sensor){
-            case Sensor.HEART_RATE_SENSOR:
+            case HEART_RATE_SENSOR:
                 icon = R.drawable.heart_rate;
                 background = R.color.data_card_heart_rate;
                 units = R.string.data_card_heart_rate_data_units;
                 break;
-            case Sensor.SKIN_TEMP_SENSOR:
+            case SKIN_TEMP_SENSOR:
                 icon = R.drawable.skin_temp;
                 background = R.color.data_card_skin_temp;
                 units = R.string.data_card_skin_temp_data_units;
                 break;
-            case Sensor.PEDOMETER_SENSOR:
+            case PEDOMETER_SENSOR:
                 icon = R.drawable.step_count;
                 background = R.color.data_card_step_count;
                 units = R.string.data_card_step_count_data_units;

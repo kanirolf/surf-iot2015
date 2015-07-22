@@ -5,14 +5,12 @@ import android.os.IBinder;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Map;
-import java.util.TreeMap;
 
+import lab.star.surf_iot2015.DataReaderService;
+import lab.star.surf_iot2015.data_settings_fragment.HeartRateSettingsFragment;
 import lab.star.surf_iot2015.sensor.SensorType;
 
-/**
- * Created by kanirolf on 7/20/15.
- */
-public class DataReaderManager implements DataReader {
+public class DataReaderManager extends DataReaderService.Stub {
 
     private final SensorManager sensorManager;
 
@@ -21,7 +19,7 @@ public class DataReaderManager implements DataReader {
     }
 
     @Override
-    public IBinder asBinder() { return null;}
+    public IBinder asBinder() {return null;}
 
     @Override
     public Map<Long, String> getEntriesFrom (String sensorType, long timestamp){
@@ -30,7 +28,7 @@ public class DataReaderManager implements DataReader {
 
     @Override
     public Map<Long, String> getEntriesBetween (String sensorType, long begin, long end){
-        return sensorManager.getSensor(SensorType.valueOf(sensorType)).findEntriesUpTo(timestamp)
+        return sensorManager.getSensor(SensorType.valueOf(sensorType)).findEntriesUpTo(begin)
                 .headMap(end);
     }
 

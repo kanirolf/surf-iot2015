@@ -2,15 +2,10 @@ package lab.star.surf_iot2015.services;
 
 import android.os.IBinder;
 
-import com.microsoft.band.BandClient;
-
-import lab.star.surf_iot2015.SensorToggler;
+import lab.star.surf_iot2015.SensorTogglerService;
 import lab.star.surf_iot2015.sensor.SensorType;
 
-/**
- * Created by kanirolf on 7/20/15.
- */
-public class SensorTogglerManager implements SensorToggler {
+public class SensorTogglerManager extends SensorTogglerService.Stub {
 
     private final SensorManager sensorManager;
 

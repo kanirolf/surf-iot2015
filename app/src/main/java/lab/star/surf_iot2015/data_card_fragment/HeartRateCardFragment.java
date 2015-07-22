@@ -5,7 +5,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import lab.star.surf_iot2015.R;
-import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.sensor.SensorType;
 
 // Specialization of DataCardFragment responsible for displaying heart rate
 public class HeartRateCardFragment extends DataCardFragment {
@@ -24,6 +24,6 @@ public class HeartRateCardFragment extends DataCardFragment {
     }
 
     @Override
-    protected String getSensorType(){ return Sensor.HEART_RATE_SENSOR; }
+    protected String getSensorType(){ return SensorType.HEART_RATE_SENSOR; }
 
 }

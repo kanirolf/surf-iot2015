@@ -16,11 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import lab.star.surf_iot2015.DataDetailsActivity;
+import lab.star.surf_iot2015.sensor.SensorType;
 import lab.star.surf_iot2015.service_user.ListenerRegistererUser;
 import lab.star.surf_iot2015.R;
 import lab.star.surf_iot2015.SensorListenerRegister;
 import lab.star.surf_iot2015.SensorServiceCallback;
-import lab.star.surf_iot2015.sensor.Sensor;
 
 // Base Fragment class for data cards: elements that are responsible for displaying sensor data
 // Don't use this directly; subclass it and override onCreateView to personalize it. :D
@@ -75,7 +75,7 @@ public abstract class DataCardFragment extends Fragment implements ListenerRegis
         super.onResume();
 
         SharedPreferences prefs = getActivity()
-                .getSharedPreferences(Sensor.SENSOR_TOGGLE_FILE, Context.MODE_PRIVATE);
+                .getSharedPreferences(SensorType.SENSOR_TOGGLE_FILE, Context.MODE_PRIVATE);
 
         prefs.registerOnSharedPreferenceChangeListener(this);
         onSharedPreferenceChanged(prefs, null);
@@ -86,7 +86,7 @@ public abstract class DataCardFragment extends Fragment implements ListenerRegis
     public void onPause(){
         super.onPause();
 
-        getActivity().getSharedPreferences(Sensor.SENSOR_TOGGLE_FILE, Context.MODE_PRIVATE)
+        getActivity().getSharedPreferences(SensorType.SENSOR_TOGGLE_FILE, Context.MODE_PRIVATE)
                 .unregisterOnSharedPreferenceChangeListener(this);
 
         if (sensorListenerRegister != null){

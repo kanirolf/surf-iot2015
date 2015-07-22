@@ -2,10 +2,11 @@ package lab.star.surf_iot2015.services;
 
 import android.os.IBinder;
 
-import lab.star.surf_iot2015.SensorListenerRegister;
+import lab.star.surf_iot2015.ListenerService;
+import lab.star.surf_iot2015.SensorListenerCallback;
 import lab.star.surf_iot2015.sensor.SensorType;
 
-public class ListenerManager implements SensorListenerRegister {
+public class ListenerManager extends ListenerService.Stub {
 
     private final SensorManager sensorManager;
 

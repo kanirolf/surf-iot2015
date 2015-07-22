@@ -8,19 +8,19 @@ import com.microsoft.band.BandIOException;
 import com.microsoft.band.sensors.BandPedometerEvent;
 import com.microsoft.band.sensors.BandPedometerEventListener;
 
-import lab.star.surf_iot2015.SensorServiceCallback;
+import lab.star.surf_iot2015.SensorListenerCallback;
 
 import static java.lang.System.currentTimeMillis;
 
 
 public class PedometerSensor extends Sensor {
 
-    private static final String SENSOR_NAME = PEDOMETER_SENSOR;
+    private static final SensorType SENSOR_TYPE = SensorType.PEDOMETER_SENSOR;
 
     private BandPedometerEventListener eventListener;
 
     public PedometerSensor (BandClient client, Context context){
-        super(SENSOR_NAME, client, context);
+        super(SENSOR_TYPE, client, context);
     }
 
     @Override
@@ -33,9 +33,9 @@ public class PedometerSensor extends Sensor {
                 String valAsString = Long.toString(bandPedometerEvent.getTotalSteps());
                 data.addEntry(currentTimeMillis(),valAsString);
 
-                for (SensorServiceCallback callback : callbacks){
+                for (SensorListenerCallback callback : callbacks){
                     try {
-                        callback.valueChanged(valAsString);
+                        callback.onValueChange(valAsString);
                     } catch (RemoteException remoteEx){
                     }
                 }

@@ -1,10 +1,7 @@
 package lab.star.surf_iot2015.data_card_fragment;
 
-import android.os.Bundle;
 import android.os.RemoteException;
 import android.util.TypedValue;
-import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -14,12 +11,10 @@ import java.util.ArrayDeque;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
-import java.util.Map;
-import java.util.Set;
 
 import lab.star.surf_iot2015.R;
 import lab.star.surf_iot2015.SensorDataReader;
-import lab.star.surf_iot2015.sensor.Sensor;
+import lab.star.surf_iot2015.sensor.SensorType;
 import lab.star.surf_iot2015.service_user.DataReaderUser;
 
 import static java.util.Collections.max;
@@ -66,7 +61,7 @@ public class StepCountCardFragment extends DataCardFragment implements DataReade
 
             try {
                 for (String value : (Collection<String>) dataReader
-                        .findEntriesUpTo(Sensor.PEDOMETER_SENSOR, todayMidnight.getTimeInMillis())
+                        .findEntriesUpTo(SensorType.PEDOMETER_SENSOR, todayMidnight.getTimeInMillis())
                         .values()){
                     values.add(Long.valueOf(value));
                 }
@@ -84,6 +79,6 @@ public class StepCountCardFragment extends DataCardFragment implements DataReade
     }
 
     @Override
-    protected String getSensorType(){ return Sensor.PEDOMETER_SENSOR; }
+    protected String getSensorType(){ return SensorType.PEDOMETER_SENSOR; }
 
 }
